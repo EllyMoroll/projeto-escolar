@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+
+     <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -7,7 +8,7 @@
 <style>
   :root {
     --bg: #0a0a0a; --card: #121212; --text: #e8e8e8; --muted: #8a8f9a;
-    --snap: #FF5A5F; --vibe: #00F2EA; --talk: #1DA1F2; --info: #FFA500;
+    --snap: #FF5A5F; --vibe: #00F2EA; --talk: #FFFFFF; --info: #FFF0F5; --story: #8B5CF6;
   }
     * { margin:0; padding:0; box-sizing:border-box; font-family: system-ui, sans-serif; }
   body { background: var(--bg); color: var(--text); padding-bottom: 100px; }
@@ -18,7 +19,7 @@
 
 .stories { display:flex; gap:12px; padding:12px; overflow-x:auto; background:var(--card); border-bottom:1px solid #2a2e36; }
 .story { display:flex; flex-direction:column; align-items:center; gap:4px; min-width:70px; cursor:pointer; }
-.story-circle { width:64px; height:64px; border-radius:50%; padding:3px; }
+.story-circle { width:64px; height:64px; border-radius:50%; padding:3px; background: linear-gradient(45deg, var(--story), #EC4899); } /* BORDA NOVA */
 .story img { width:100%; height:100%; border-radius:50%; object-fit:cover; border:2px solid var(--card); }
 .story span { font-size:10px; color:var(--muted); }
 
@@ -26,30 +27,38 @@
 .post { background: var(--card); border-radius: 12px; padding: 12px; margin-bottom: 16px; position:relative; }
 .post.snap { border-left: 4px solid var(--snap); }
 .post.vibe { background:#000; border-radius:0; height: 85vh; display:flex; align-items:center; justify-content:center; padding:0; border:none; }
-.post.talk { border-radius:0; border-left: 4px solid var(--talk); }
-.post.info { border-radius:16px; border:1px solid var(--info); background:#1a1a1a; }
+.post.talk { border-radius:0; border-left: 4px solid var(--talk); background: var(--talk); color:#000; } /* BRANCO */
+.post.talk .username, .post.talk p { color:#000; }
+.post.info { border-radius:16px; border:1px solid #FFB6C1; background: var(--info); color:#333; } /* ROSA CLARINHO */
+.post.info .username, .post.info p { color:#333; }
 .post-header { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
 .avatar { width:36px; height:36px; border-radius:50%; background:#333; object-fit:cover; cursor:pointer; }
 .username { font-weight: bold; font-size: 14px; }
 .post img.content { width:100%; border-radius:8px; margin:8px 0; }
 .post p { font-size: 14px; line-height: 1.4; }
-.post.info p { font-size:15px; line-height:1.6; } /* texto maior pra noticia */
+.post.info p { font-size:15px; line-height:1.6; }
 
 .vibe-container { position:relative; width:100%; height:100%; }
 .vibe-container video { width:100%; height:100%; object-fit:cover; }
 .vibe-side { position:absolute; right:10px; bottom:80px; display:flex; flex-direction:column; gap:20px; align-items:center; }
 .vibe-btn { display:flex; flex-direction:column; align-items:center; cursor:pointer; }
 .vibe-btn span { font-size:12px; font-weight:bold; }
-.heart { font-size:28px; }
+.heart { font-size:28px; transition: transform 0.2s; }
 .heart.liked { color:red; animation: pop 0.3s; }
-@keyframes pop { 0%{transform:scale(1);} 50%{transform:scale(1.5);} 100%{transform:scale(1);} }
+@keyframes pop { 0%{transform:scale(1);} 50%{transform:scale(1.6);} 100%{transform:scale(1);} }
 
 .post-actions { display:flex; gap:16px; margin-top:8px; }
 .action-btn { background:none; border:none; color:var(--muted); cursor:pointer; font-size:14px; display:flex; align-items:center; gap:4px; }
+.post.talk .action-btn { color:#555; }
+.post.info .action-btn { display:none; } /* SEM AÇÃO NO INFO */
 .action-btn.liked { color: var(--snap); }
 
 .composer { background: var(--card); padding: 12px; border-radius: 12px; margin-top: 20px; border:1px dashed #2a2e36; }
+.post.talk .composer { background:#f5f5f5; border-color:#ddd; }
+.post.info .composer { background:#FFE4E1; border-color:#FFB6C1; }
 .composer textarea { width:100%; background:#0a0a0a; border:1px solid #2a2e36; border-radius:8px; padding:8px; color:var(--text); resize:none; }
+.post.talk .composer textarea { background:#fff; color:#000; border-color:#ddd; }
+.post.info .composer textarea { background:#fff; color:#000; border-color:#FFB6C1; }
 .composer input { margin: 8px 0; color: var(--muted); font-size:12px; }
 .composer button { background: var(--accent); color:white; border:none; padding: 8px 16px; border-radius:8px; cursor:pointer; font-weight:bold; }
 #mediaLabel { font-size:12px; color:var(--muted); }
@@ -57,7 +66,7 @@
 .tabs { display: flex; justify-content: space-around; background: var(--card); position: fixed; bottom: 0; left: 0; right: 0; border-top: 1px solid #2a2e36; padding: 8px 0; }
 .tab { flex: 1; text-align: center; cursor: pointer; padding: 6px; color: var(--muted); font-size: 11px; }
 .tab.active.snap { color: var(--snap); }.tab.active.vibe { color: var(--vibe); }
-.tab.active.talk { color: var(--talk); }.tab.active.info { color: var(--info); }
+.tab.active.talk { color: var(--talk); background:#333; }.tab.active.info { color: #FF69B4; }
 .tab img { width: 24px; height: 24px; display:block; margin: 0 auto 4px; border-radius:4px; object-fit:cover; }
 
 .modal { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.8); display:none; justify-content:center; align-items:center; z-index:20; }
@@ -138,6 +147,7 @@
     document.getElementById('media').accept = current.media;
     document.getElementById('mediaLabel').innerText = currentTab==='vibe'? "Adicionar Vídeo ou Imagem:" : "Adicionar Imagem:";
     document.documentElement.style.setProperty('--accent', `var(${current.color})`);
+    document.body.style.background = current.id==='talk' ? '#fff' : current.id==='info' ? '#FFF0F5' : 'var(--bg)';
   }
 
   function toggleLike(id) {
@@ -148,6 +158,11 @@
     localStorage.setItem('posts', JSON.stringify(posts));
     renderPosts();
   }
+  
+  function repost(id) {
+    alert("Repostado! 🔄");
+    // aqui só simula, pra ficar real precisaria duplicar o post
+  }
 
   function renderStories() {
     const sDiv = document.getElementById('stories');
@@ -155,7 +170,7 @@
     accounts.forEach(a => {
       sDiv.innerHTML += `
         <div class="story">
-          <div class="story-circle" style="background: linear-gradient(45deg, var(--snap), #FCAF45)"><img src="${a.img || 'https://via.placeholder.com/64'}" alt=""></div>
+          <div class="story-circle"><img src="${a.img || 'https://via.placeholder.com/64'}" alt=""></div>
           <span>${a.name}</span>
         </div>
       `;
@@ -233,14 +248,15 @@
                   <div class="heart ${p.liked?'liked':''}">❤️</div>
                   <span>${p.likes || 0}</span>
                 </div>
+                <div class="vibe-btn" onclick="repost(${p.id})"><div>🔄</div><span>0</span></div>
                 <div class="vibe-btn"><div>💬</div><span>0</span></div>
               </div>
-              <div style="position:absolute; bottom:20px; left:12px;">
+              <div style="position:absolute; bottom:20px; left:12px; right:60px;">
                 <div style="display:flex; gap:8px; align-items:center;">
                   <img class="avatar" style="width:32px; height:32px;" src="${accounts[0].img || 'https://via.placeholder.com/32'}">
-                  <b>@${p.user}</b>
+                  <b>@${p.user.toLowerCase()}</b>
                 </div>
-                <p style="margin-top:6px; font-size:13px;">${p.text}</p>
+                <p style="margin-top:6px; font-size:13px;">${p.text}</p> <!-- LEGENDA -->
               </div>
             </div>
           </div>
@@ -249,12 +265,12 @@
         let mediaHTML = "";
         if(p.mediaType==='image') mediaHTML = `<img class="content" src="${p.media}">`;
         if(p.mediaType==='video') mediaHTML = `<video class="content" src="${p.media}" controls></video>`;
-        let actionsHTML = p.tab !== 'info' ? `<div class="post-actions"><button class="action-btn ${p.liked?'liked':''}" onclick="toggleLike(${p.id})">❤️ ${p.likes || 0}</button><button class="action-btn">💬 0</button></div>` : "";
+        let actionsHTML = p.tab !== 'info' ? `<div class="post-actions"><button class="action-btn ${p.liked?'liked':''}" onclick="toggleLike(${p.id})">❤️ ${p.likes || 0}</button><button class="action-btn" onclick="repost(${p.id})">🔄 0</button><button class="action-btn">💬 0</button></div>` : "";
 
         container.innerHTML += `
           <div class="post ${p.tab}">
-            <div class="post-header"><img class="avatar" src="${accounts[0].img || 'https://via.placeholder.com/36'}"><div><div class="username">${p.user}</div></div></div>
-            <p>${p.text}</p>
+            <div class="post-header"><img class="avatar" src="${accounts[0].img || 'https://via.placeholder.com/36'}"><div><div class="username">@${p.user.toLowerCase()}</div></div></div>
+            <p>${p.text}</p> <!-- LEGENDA TAMBEM -->
             ${mediaHTML}
             ${actionsHTML}
           </div>
