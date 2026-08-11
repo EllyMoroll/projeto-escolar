@@ -41,7 +41,6 @@
 .vibe-side { position:absolute; right:12px; bottom:120px; display:flex; flex-direction:column; gap:22px; align-items:center; z-index:3; }
 .vibe-btn { display:flex; flex-direction:column; align-items:center; cursor:pointer; color:#fff; }
 .vibe-btn div { font-size:30px; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.9)); }
-.vibe-btn.count-edit { font-size:13px; font-weight:bold; text-shadow: 0 2px 6px rgba(0,0,0,0.9); margin-top:4px; }
 .heart.liked { color:#ff2d55; animation: pop 0.3s; }
   @keyframes pop { 0%{transform:scale(1);} 50%{transform:scale(1.6);} 100%{transform:scale(1);} }
 .vibe-info { position:absolute; bottom:80px; left:14px; right:80px; color:#fff; z-index:3; }
@@ -336,4 +335,43 @@
                 <div class="vibe-user">
                   <img src="${acc.img || 'https://via.placeholder.com/32'}">
                   <b>@${p.userId}</b>
-         
+                </div>
+                <p>${p.text}</p>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if(p.tab === 'info') {
+        const lines = p.text.split('\n');
+        const title = lines[0] || 'Título da Notícia';
+        const content = lines.slice(1).join('\n');
+        container.innerHTML += `
+          <div class="post ${p.tab}">
+            <h3>${title}</h3>
+            <p>${content}</p>
+            ${p.mediaType==='image'? `<img class="content" src="${p.media}">` : ""}
+          </div>
+        `;
+      } else {
+        let mediaHTML = "";
+        if(p.mediaType==='image') mediaHTML = `<img class="content" src="${p.media}">`;
+        if(p.mediaType==='video') mediaHTML = `<video class="content" src="${p.media}" controls></video>`;
+        container.innerHTML += `
+          <div class="post ${p.tab}">
+            <div class="post-header"><img class="avatar" src="${acc.img || 'https://via.placeholder.com/40'}"><div><div class="username">@${p.userId}</div></div></div>
+            <p>${p.text}</p>
+            ${mediaHTML}
+            <div class="post-actions">
+              <button class="action-btn ${p.liked?'liked':''}" onclick="toggleLike(${p.id})">❤️ <input class="count-edit-normal" value="${p.likes}" onchange="editCount(${p.id},'likes',this)"></button>
+              <button class="action-btn">💬 <input class="count-edit-normal" value="${p.comments}" onchange="editCount(${p.id},'comments',this)"></button>
+              <button class="action-btn">🔄 <input class="count-edit-normal" value="${p.reposts}" onchange="editCount(${p.id},'reposts',this)"></button>
+            </div>
+          </div>
+        `;
+      }
+    });
+  }
+  renderTabs(); renderStories(); renderPosts();
+</script>
+</body>
+</html>
