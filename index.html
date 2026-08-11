@@ -1,5 +1,4 @@
-
-     <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -26,7 +25,7 @@
 .feed { max-width: 600px; margin: 0 auto; padding: 16px; }
 .post { background: var(--card); border-radius: 12px; padding: 12px; margin-bottom: 16px; position:relative; }
 .post.snap { border-left: 4px solid var(--snap); }
-.post.vibe { background:#000; border-radius:0; height: 85vh; display:flex; align-items:center; justify-content:center; padding:0; border:none; margin:0 auto 16px; }
+.post.vibe { background:#000; border-radius:0; height: 90vh; max-height: 700px; width: 100%; max-width: 400px; margin: 0 auto 16px; padding:0; border:none; overflow:hidden; } /* VERTICAL */
 .post.talk { border-radius:0; border-left: 4px solid #ddd; background: var(--talk); color:#000; }
 .post.talk .username, .post.talk p { color:#000; }
 .post.info { border-radius:16px; border:1px solid #FFB6C1; background: var(--info); color:#333; padding:16px; }
@@ -38,17 +37,16 @@
 .post p { font-size: 14px; line-height: 1.4; }
 .post.info h3 { margin-bottom:8px; font-size:18px; }
 
-  /* VIBECLIP TIKTOK REAL */
 .vibe-container { position:relative; width:100%; height:100%; }
-.vibe-container video { width:100%; height:100%; object-fit:cover; }
-.vibe-side { position:absolute; right:12px; bottom:100px; display:flex; flex-direction:column; gap:24px; align-items:center; z-index:2; } /* VERTICAL */
+.vibe-container video { width:100%; height:100%; object-fit:cover; } /* FORÇA FICAR VERTICAL */
+.vibe-side { position:absolute; right:12px; bottom:100px; display:flex; flex-direction:column; gap:24px; align-items:center; z-index:2; }
 .vibe-btn { display:flex; flex-direction:column; align-items:center; cursor:pointer; color:#fff; }
 .vibe-btn span { font-size:12px; font-weight:bold; text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
 .heart { font-size:32px; transition: transform 0.2s; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5)); }
 .heart.liked { color:red; animation: pop 0.3s; }
 @keyframes pop { 0%{transform:scale(1);} 50%{transform:scale(1.6);} 100%{transform:scale(1);} }
 
-.vibe-info { position:absolute; bottom:20px; left:12px; right:80px; color:#fff; z-index:2; } /* POR CIMA DO VIDEO */
+.vibe-info { position:absolute; bottom:20px; left:12px; right:80px; color:#fff; z-index:2; }
 .vibe-info b { font-size:15px; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
 .vibe-info p { margin-top:6px; font-size:14px; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
 .vibe-gradient { position:absolute; bottom:0; left:0; right:0; height:200px; background: linear-gradient(transparent, rgba(0,0,0,0.7)); z-index:1; }
@@ -71,6 +69,7 @@
 .composer input { margin: 8px 0; color: var(--muted); font-size:12px; }
 .composer button { background: var(--accent); color:white; border:none; padding: 8px 16px; border-radius:8px; cursor:pointer; font-weight:bold; }
 #mediaLabel { font-size:12px; color:var(--muted); }
+.info-title-input { width:100%; background:#fff; border:1px solid #FFB6C1; border-radius:8px; padding:8px; color:#000; margin-bottom:8px; font-weight:bold; }
 
 .tabs { display: flex; justify-content: space-around; background: var(--card); position: fixed; bottom: 0; left: 0; right: 0; border-top: 1px solid #2a2e36; padding: 8px 0; }
 .tab { flex: 1; text-align: center; cursor: pointer; padding: 6px; color: var(--muted); font-size: 11px; }
@@ -95,7 +94,10 @@
 <div class="feed">
   <div id="posts"></div>
 
-  <div class="composer">
+  <div class="composer" id="composer">
+    <div id="infoTitleDiv" style="display:none;">
+      <input type="text" id="infoTitle" class="info-title-input" placeholder="Título da Notícia">
+    </div>
     <textarea id="text" rows="3" placeholder="Criar post..."></textarea>
     <label id="mediaLabel">Adicionar Imagem:</label>
     <input type="file" id="media" accept="image/*">
@@ -109,18 +111,27 @@
   <div class="modal-content">
     <h2>Configurar</h2>
     <div class="upload-group">
-      <h3>Sua Foto de Perfil</h3>
+      <h3>Editar Nossa Conta</h3>
+      <input type="text" id="myName" placeholder="Nome de usuário">
       <input type="file" id="myAvatar" accept="image/*" onchange="changeMyAvatar(event)">
+      <button onclick="saveMyAccount()">Salvar Conta</button>
     </div>
     <div class="upload-group">
       <h3>Ícones das Abas</h3>
       <div id="iconUploads"></div>
     </div>
     <div class="upload-group">
-      <h3>Adicionar "Contas" pros Stories</h3>
+      <h3>Adicionar Contas pro SnapLife</h3>
       <input type="text" id="accountName" placeholder="Nome da conta">
       <input type="file" id="accountImg" accept="image/*">
       <button onclick="addAccount()">Adicionar Conta</button>
+    </div>
+    <div class="upload-group" id="talkAccounts">
+      <h3>Adicionar Contas + Post pro TalkNow</h3>
+      <input type="text" id="talkAccountName" placeholder="Nome da conta">
+      <input type="text" id="talkAccountPost" placeholder="O que ela vai falar?">
+      <input type="file" id="talkAccountImg" accept="image/*">
+      <button onclick="addTalkAccount()">Adicionar Conta com Post</button>
     </div>
     <button onclick="closeConfig()">Salvar e Fechar</button>
   </div>
@@ -165,6 +176,8 @@
     document.getElementById('stories').style.display = current.showStories ? 'flex' : 'none';
     document.getElementById('media').accept = current.media;
     document.getElementById('mediaLabel').innerText = currentTab==='vibe'? "Adicionar Vídeo ou Imagem:" : "Adicionar Imagem:";
+    document.getElementById('infoTitleDiv').style.display = currentTab==='info' ? 'block' : 'none';
+    document.getElementById('text').placeholder = currentTab==='info' ? 'Conteúdo da notícia...' : 'Criar post...';
     document.documentElement.style.setProperty('--accent', `var(${current.color})`);
     document.body.style.background = current.id==='talk' ? '#fff' : current.id==='info' ? '#FFF0F5' : 'var(--bg)';
   }
@@ -182,6 +195,17 @@
     const post = posts.find(p => p.id === id);
     post[type] = val;
     localStorage.setItem('posts', JSON.stringify(posts));
+  }
+
+  function saveMyAccount() {
+    const name = document.getElementById('myName').value;
+    if(name) {
+      accounts[0].name = name;
+      accounts[0].user = name.toLowerCase().replace(/\s/g,'');
+      localStorage.setItem('accounts', JSON.stringify(accounts));
+      alert("Conta salva!");
+      renderPosts();
+    }
   }
 
   function renderStories() {
@@ -222,7 +246,30 @@
     reader.readAsDataURL(file);
   }
 
+  function addTalkAccount() {
+    const name = document.getElementById('talkAccountName').value;
+    const postText = document.getElementById('talkAccountPost').value;
+    const file = document.getElementById('talkAccountImg').files[0];
+    if(!name || !postText) return alert("Coloca nome e o que ela vai falar");
+    const user = name.toLowerCase().replace(/\s/g,'');
+    const save = (imgData) => {
+      accounts.push({name, img:imgData, user});
+      posts.unshift({id:Date.now(), tab:'talk', user, userId:user, text:postText, media:null, likes:Math.floor(Math.random()*500), liked:false, comments:Math.floor(Math.random()*100), reposts:Math.floor(Math.random()*50)});
+      localStorage.setItem('accounts', JSON.stringify(accounts));
+      localStorage.setItem('posts', JSON.stringify(posts));
+      renderStories(); renderPosts();
+      document.getElementById('talkAccountName').value = "";
+      document.getElementById('talkAccountPost').value = "";
+    }
+    if(file) {
+      const reader = new FileReader();
+      reader.onload = e => save(e.target.result);
+      reader.readAsDataURL(file);
+    } else save("");
+  }
+
   function openConfig() {
+    document.getElementById('myName').value = accounts[0].name;
     const uploadsDiv = document.getElementById('iconUploads');
     uploadsDiv.innerHTML = "";
     tabsData.forEach(t => {
@@ -241,12 +288,15 @@
 
   function addPost() {
     const text = document.getElementById('text').value;
+    const title = document.getElementById('infoTitle').value;
     const file = document.getElementById('media').files[0];
+    const finalText = currentTab==='info' ? `${title}\n${text}` : text;
+    
     const savePost = (mediaData, type) => {
       const acc = accounts[0];
-      posts.unshift({id:Date.now(), tab:currentTab, user:acc.name, userId:acc.user, text, media:mediaData, mediaType:type, likes:0, liked:false, comments:0, reposts:0});
+      posts.unshift({id:Date.now(), tab:currentTab, user:acc.name, userId:acc.user, text:finalText, media:mediaData, mediaType:type, likes:0, liked:false, comments:0, reposts:0});
       localStorage.setItem('posts', JSON.stringify(posts));
-      document.getElementById('text').value = ""; document.getElementById('media').value = "";
+      document.getElementById('text').value = ""; document.getElementById('infoTitle').value = ""; document.getElementById('media').value = "";
       renderPosts();
     }
     if (file) {
@@ -267,9 +317,7 @@
           <div class="post vibe">
             <div class="vibe-container">
               <video src="${p.media}" autoplay loop muted playsinline></video>
-              <div class="vibe-gradient"></div> <!-- ESCURECE EMBAIXO -->
-              
-              <!-- BOTOES VERTICAIS -->
+              <div class="vibe-gradient"></div>
               <div class="vibe-side">
                 <div class="vibe-btn" onclick="toggleLike(${p.id})">
                   <div class="heart ${p.liked?'liked':''}">❤️</div>
@@ -278,8 +326,6 @@
                 <div class="vibe-btn"><div>💬</div><input class="count-edit" value="${p.comments}" onchange="editCount(${p.id},'comments',this)"></div>
                 <div class="vibe-btn"><div>🔄</div><input class="count-edit" value="${p.reposts}" onchange="editCount(${p.id},'reposts',this)"></div>
               </div>
-              
-              <!-- INFO POR CIMA DO VIDEO -->
               <div class="vibe-info">
                 <div style="display:flex; gap:8px; align-items:center;">
                   <img class="avatar" style="width:32px; height:32px; border:2px solid #fff;" src="${acc.img || 'https://via.placeholder.com/32'}">
@@ -291,10 +337,13 @@
           </div>
         `;
       } else if(p.tab === 'info') {
+        const lines = p.text.split('\n');
+        const title = lines[0] || 'Título da Notícia';
+        const content = lines.slice(1).join('\n');
         container.innerHTML += `
           <div class="post ${p.tab}">
-            <h3>${p.text.split('\n')[0] || 'Título da Notícia'}</h3>
-            <p>${p.text}</p>
+            <h3>${title}</h3>
+            <p>${content}</p>
             ${p.mediaType==='image'? `<img class="content" src="${p.media}">` : ""}
           </div>
         `;
