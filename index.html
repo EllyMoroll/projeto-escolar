@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MeuFeed</title>
+<style>
+  :root {
+    --bg: #0f1115; --card: #1a1d23; --text: #e8e8e8; --muted: #8a8f9a;
+    --insta: #E1306C; --tiktok: #00F2EA; --x: #1DA1F2; --news: #FFA500;
+  }
+    * { margin:0; padding:0; box-sizing:border-box; font-family: system-ui, sans-serif; }
+  body { background: var(--bg); color: var(--text); padding-bottom: 100px; }
+
+  header { position: sticky; top:0; z-index:10; background: var(--card); padding: 12px; display: flex; justify-content: space-between; border-bottom: 1px solid #2a2e36; }
+  header h1 { font-size: 20px; }
+  #btnConfig { background:none; border:none; color:var(--muted); cursor:pointer; font-size:20px; }
+
+.stories { display:flex; gap:12px; padding:12px; overflow-x:auto; background:var(--card); border-bottom:1px solid #2a2e36; }
+.story { display:flex; flex-direction:column; align-items:center; gap:4px; min-width:70px; cursor:pointer; }
+.story-circle { width:64px; height:64px; border-radius:50%; padding:3px; background: linear-gradient(45deg, var(--insta), #FCAF45); }
+.story img { width:100%; height:100%; border-radius:50%; object-fit:cover; border:2px solid var(--card); }
+.story span { font-size:10px; color:var(--muted); }
+
+.feed { max-width: 600px; margin: 0 auto; padding: 16px; }
+.post { background: var(--card); border-radius: 12px; padding: 12px; margin-bottom: 16px; border-left:4px solid transparent; }
+.post.instagram { border-color: var(--insta); }
+.post.tiktok { border-color: var(--tiktok); background:#000; border-radius:0; } /* tiktok é preto e quadrado */
+.post.x { border-color: var(--x); border-radius:0; }
+.post.noticias { border-color: var(--news); }
+.post-header { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.avatar { width:36px; height:36px; border-radius:50%; background:#333; object-fit:cover; }
+.username { font-weight: bold; font-size: 14px; }
+.post img.content,.post video.content { width:100%; border-radius:8px; margin:8px 0; }
+.post.tiktok video.content { aspect-ratio: 9/16; object-fit:cover; border-radius:0; } /* formato tiktok */
+.post p { font-size: 14px; line-height: 1.4; }
+
+.composer { background: var(--card); padding: 12px; border-radius: 12px; margin-bottom: 20px; }
+.composer textarea { width:100%; background:#0f1115; border:1px solid #2a2e36; border-radius:8px; padding:8px; color:var(--text); resize:none; }
+.composer input { margin: 8px 0; color: var(--muted); font-size:12px; }
+.composer button { background: var(--accent, #7c5cff); color:white; border:none; padding: 8px 16px; border-radius:8px; cursor:pointer; font-weight:bold; }
+#mediaLabel { font-size:12px; color:var(--muted); }
+
+.tabs { display: flex; justify-content: space-around; background: var(--card); position: fixed; bottom: 0; left: 0; right: 0; border-top: 1px solid #2a2e36; padding: 8px 0; }
+.tab { flex: 1; text-align: center; cursor: pointer; padding: 6px; color: var(--muted); font-size: 11px; }
+.tab.active.instagram { color: var(--insta); }.tab.active.tiktok { color: var(--tiktok); }
+.tab.active.x { color: var(--x); }.tab.active.noticias { color: var(--news); }
+.tab img { width: 24px; height: 24px; display:block; margin: 0 auto 4px; border-radius:4px; object-fit:cover; }
+
+.modal { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.8); display:none; justify-content:center; align-items:center; z-index:20; }
+.modal-content { background:var(--card); padding:20px; border-radius:12px; width:90%; max-width:400px; max-height:80vh; overflow-y:auto; }
+.modal-content h2 { margin-bottom:12px; font-size:16px; }
+.upload-group { margin-bottom:12px; border-bottom:1px solid #2a2e36; padding-bottom:12px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1 id="headerTitle">MeuFeed</h1>
+  <button id="btnConfig" onclick="openConfig()">⚙️</button>
+</header>
+
+<div class="stories" id="stories"></div>
+
+<div class="feed">
+  <div class="composer">
+    <textarea id="text" rows="3" placeholder="Criar post..."></textarea>
+    <label id="mediaLabel">Adicionar Imagem:</label>
+    <input type="file" id="media" accept="image/*">
+    <button onclick="addPost()">Postar</button>
+  </div>
+  <div id="posts"></div>
+</div>
+
+<div class="tabs" id="tabs"></div>
+
+<div class="modal" id="configModal">
+  <div class="modal-content">
+    <h2>Configurar</h2>
+    <div class="upload-group">
+      <h3>Ícones das Abas</h3>
+      <div id="iconUploads"></div>
+    </div>
+    <div class="upload-group">
+      <h3>Adicionar "Contas" pros Stories</h3>
+      <input type="text" id="accountName" placeholder="Nome da conta">
+      <input type="file" id="accountImg" accept="image/*">
+      <button onclick="addAccount()">Adicionar Conta</button>
+    </div>
+    <button onclick="closeConfig()">Salvar e Fechar</button>
+  </div>
+</div>
+
+<script>
+  const tabsData = [
+    {id: 'instagram', name: 'Insta', color:'--insta', media:'image/*'},
+    {id: 'tiktok', name: 'TikTok', color:'--tiktok', media:'video/*,image/*'}, // aqui aceita video
+    {id: 'x', name: 'X', color:'--x', media:'image/*'},
+    {id: 'noticias', name: 'Notícias', color:'--news', media:'image/*'}
+  ];
+  let currentTab = 'instagram';
+  let posts = JSON.parse(localStorage.getItem('posts')) || [];
+  let icons = JSON.parse(localStorage.getItem('icons')) || {};
+  let accounts = JSON.parse(localStorage.getItem('accounts')) || [{name:"Você", img:""}];
+
+  function renderTabs() {
+    const tabsDiv = document.getElementById('tabs');
+    tabsDiv.innerHTML = "";
+    tabsData.forEach(t => {
+      tabsDiv.innerHTML += `
+        <div class="tab ${currentTab===t.id?'active '+t.id:''}" onclick="showFeed('${t.id}')">
+          <img src="${icons[t.id] || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIGZpbGw9IiM4YThmOWEiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiLz48L3N2Zz4='}" alt="${t.name}">
+          ${t.name}
+        </div>
+      `;
+    });
+    document.getElementById('headerTitle').style.color = `var(${tabsData.find(t=>t.id===currentTab).color})`;
+    updateComposer();
+  }
+
+  function updateComposer() {
+    const tab = tabsData.find(t=>t.id===currentTab);
+    document.getElementById('media').accept = tab.media;
+    document.getElementById('mediaLabel').innerText = currentTab==='tiktok'? "Adicionar Vídeo ou Imagem:" : "Adicionar Imagem:";
+  }
+
+  function renderStories() {
+    const sDiv = document.getElementById('stories');
+    sDiv.innerHTML = "";
+    accounts.forEach(a => {
+      sDiv.innerHTML += `
+        <div class="story">
+          <div class="story-circle"><img src="${a.img || 'https://via.placeholder.com/64'}" alt=""></div>
+          <span>${a.name}</span>
+        </div>
+      `;
+    });
+  }
+
+  function addAccount() {
+    const name = document.getElementById('accountName').value;
+    const file = document.getElementById('accountImg').files[0];
+    if(!name ||!file) return alert("Coloca nome e imagem");
+    const reader = new FileReader();
+    reader.onload = e => {
+      accounts.push({name, img:e.target.result});
+      localStorage.setItem('accounts', JSON.stringify(accounts));
+      renderStories();
+      document.getElementById('accountName').value = "";
+    }
+    reader.readAsDataURL(file);
+  }
+
+  function openConfig() {
+    const uploadsDiv = document.getElementById('iconUploads');
+    uploadsDiv.innerHTML = "";
+    tabsData.forEach(t => {
+      uploadsDiv.innerHTML += `<label>${t.name}</label><input type="file" accept="image/*" onchange="uploadIcon(event, '${t.id}')"><br><br>`;
+    });
+    document.getElementById('configModal').style.display = 'flex';
+  }
+  function uploadIcon(e, tabId) {
+    const reader = new FileReader();
+    reader.readAsDataURL(e.target.files[0]);
+    reader.onload = ev => { icons[tabId] = ev.target.result; localStorage.setItem('icons', JSON.stringify(icons)); renderTabs(); }
+  }
+  function closeConfig() { document.getElementById('configModal').style.display = 'none'; }
+
+  function showFeed(tab) { currentTab = tab; renderTabs(); renderPosts(); }
+
+  function addPost() {
+    const text = document.getElementById('text').value;
+    const file = document.getElementById('media').files[0];
+    const savePost = (mediaData, type) => {
+      posts.unshift({id:Date.now(), tab:currentTab, user:"Você", text, media:mediaData, mediaType:type});
+      localStorage.setItem('posts', JSON.stringify(posts));
+      document.getElementById('text').value = ""; document.getElementById('media').value = "";
+      renderPosts();
+    }
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = e => savePost(e.target.result, file.type.startsWith('video')? 'video' : 'image');
+      reader.readAsDataURL(file);
+    } else savePost(null, null);
+  }
+
+  function renderPosts() {
+    const container = document.getElementById('posts');
+    container.innerHTML = "";
+    posts.filter(p => p.tab === currentTab).forEach(p => {
+      let mediaHTML = "";
+      if(p.mediaType==='image') mediaHTML = `<img class="content" src="${p.media}">`;
+      if(p.mediaType==='video') mediaHTML = `<video class="content" src="${p.media}" controls autoplay loop muted playsinline></video>`;
+
+      container.innerHTML += `
+        <div class="post ${p.tab}">
+          <div class="post-header"><img class="avatar" src="${accounts[0].img || 'https://via.placeholder.com/36'}"><div><div class="username">${p.user}</div></div></div>
+          <p>${p.text}</p>
+          ${mediaHTML}
+        </div>
+      `;
+    });
+  }
+
+  renderTabs(); renderStories(); renderPosts();
+</script>
+</body>
+</html>
