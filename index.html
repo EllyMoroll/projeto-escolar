@@ -15,7 +15,7 @@
   header { position: sticky; top:0; z-index:10; background: var(--card); padding: 14px 16px; display: flex; justify-content: space-between; align-items:center; border-bottom: 1px solid #2a2e36; }
   header h1 { font-size: 20px; font-weight: 700; transition: color 0.3s; }
 .header-buttons { display:flex; gap:8px; }
-  #btnConfig, #btnClear { background:none; border:none; color:var(--muted); cursor:pointer; font-size:20px; padding:4px; }
+  #btnConfig, #btnClear, #btnFix { background:none; border:none; color:var(--muted); cursor:pointer; font-size:20px; padding:4px; }
 .stories { display:flex; gap:12px; padding:12px 16px; overflow-x:auto; background:var(--card); border-bottom:1px solid #2a2e36; }
 .stories::-webkit-scrollbar { display:none; }
 .story { display:flex; flex-direction:column; align-items:center; gap:4px; min-width:70px; cursor:pointer; }
@@ -41,11 +41,12 @@
 .vibe-side { position:absolute; right:12px; bottom:120px; display:flex; flex-direction:column; gap:22px; align-items:center; z-index:3; }
 .vibe-btn { display:flex; flex-direction:column; align-items:center; cursor:pointer; color:#fff; }
 .vibe-btn div { font-size:30px; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.9)); }
+.vibe-btn.count-edit { font-size:14px; font-weight:bold; text-shadow: 0 2px 6px rgba(0,0,0,0.9); margin-top:4px; background:rgba(0,0,0,0.5); border:1px solid #fff; border-radius:8px; width:60px; text-align:center; padding:3px; color:#fff; }
 .heart.liked { color:#ff2d55; animation: pop 0.3s; }
   @keyframes pop { 0%{transform:scale(1);} 50%{transform:scale(1.6);} 100%{transform:scale(1);} }
 .vibe-info { position:absolute; bottom:80px; left:14px; right:80px; color:#fff; z-index:3; }
 .vibe-info.vibe-user { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
-.vibe-info.vibe-user img { width:32px; height:32px; border-radius:50%; border:2px solid #fff; }
+.vibe-info.vibe-user img { width:32px; height:32px; border-radius:50%; border:2px solid #fff; object-fit:cover; }
 .vibe-info b { font-size:16px; text-shadow: 0 2px 6px rgba(0,0,0,0.9); }
 .vibe-info p { margin-top:8px; font-size:14px; text-shadow: 0 2px 6px rgba(0,0,0,0.9); }
 .vibe-gradient { position:absolute; bottom:0; left:0; right:0; height:280px; background: linear-gradient(transparent, rgba(0,0,0,0.85)); z-index:2; }
@@ -90,6 +91,7 @@
 <header>
   <h1 id="headerTitle">HubSocial</h1>
   <div class="header-buttons">
+    <button id="btnFix" onclick="fixUndefined()" title="Corrigir @undefined">🔧</button>
     <button id="btnClear" onclick="clearPosts()" title="Limpar Posts">🗑️</button>
     <button id="btnConfig" onclick="openConfig()" title="Configurações">⚙️</button>
   </div>
@@ -129,10 +131,16 @@
       <button onclick="addAccount()">Adicionar Conta</button>
     </div>
     <div class="upload-group">
+      <h3>Adicionar Contas pro VibeClip</h3>
+      <input type="text" id="vibeAccountName" placeholder="Nome da conta">
+      <input type="file" id="vibeAccountImg" accept="image/*">
+      <button onclick="addVibeAccount()">Adicionar Conta Vibe</button>
+    </div>
+    <div class="upload-group">
       <h3>Adicionar Contas + Post pro TalkNow</h3>
       <input type="text" id="talkAccountName" placeholder="Nome da conta">
       <input type="text" id="talkAccountPost" placeholder="O que ela vai falar?">
-      <input type="file" id="talkAccountImg" accept="image/*">
+      <input type="file" id="talkAccountImg" accept="image/*,video/*">
       <button onclick="addTalkAccount()">Adicionar Conta com Post</button>
     </div>
     <button onclick="closeConfig()" style="width:100%; background:#555;">Salvar e Fechar</button>
@@ -142,24 +150,46 @@
   const tabsData = [
     {id: 'snap', name: 'SnapLife', color:'--snap', media:'image/*', showStories:true},
     {id: 'vibe', name: 'VibeClip', color:'--vibe', media:'video/*,image/*', showStories:false},
-    {id: 'talk', name: 'TalkNow', color:'--talk', media:'image/*', showStories:false},
+    {id: 'talk', name: 'TalkNow', color:'--talk', media:'image/*,video/*', showStories:false},
     {id: 'info', name: 'InfoFlash', color:'--info', media:'image/*', showStories:false}
   ];
+
   let accounts = JSON.parse(localStorage.getItem('accounts')) || [
     {name:"voce", img:"", user:"voce"},
     {name:"mariatech", img:"", user:"mariatech"},
     {name:"joaozinho", img:"", user:"joaozinho"}
   ];
+
   let currentTab = 'snap';
   let posts = JSON.parse(localStorage.getItem('posts')) || [];
   let icons = JSON.parse(localStorage.getItem('icons')) || {};
+
+  function fixUndefined(){
+    let mudou = false;
+    posts = posts.map(p => {
+      if(!p.userId){
+        p.userId = p.user || accounts[0].user;
+        mudou = true;
+      }
+      return p;
+    });
+    if(mudou){
+      localStorage.setItem('posts', JSON.stringify(posts));
+      alert("Posts corrigidos! Recarregando...");
+      renderPosts();
+    } else {
+      alert("Nada pra corrigir!");
+    }
+  }
+
   function clearPosts() {
-    if(confirm("Apagar todos os posts? Isso corrige o @undefined")) {
+    if(confirm("Apagar todos os posts?")) {
       localStorage.removeItem('posts');
       posts = [];
       renderPosts();
     }
   }
+
   function renderTabs() {
     const tabsDiv = document.getElementById('tabs');
     tabsDiv.innerHTML = "";
@@ -176,28 +206,31 @@
     document.getElementById('headerTitle').style.color = `var(${current.color})`;
     document.getElementById('stories').style.display = current.showStories? 'flex' : 'none';
     document.getElementById('media').accept = current.media;
-    document.getElementById('mediaLabel').innerText = currentTab==='vibe'? "Gravar/Enviar Vídeo:" : "Adicionar Imagem:";
+    document.getElementById('mediaLabel').innerText = currentTab==='vibe'? "Gravar/Enviar Vídeo:" : currentTab==='talk'? "Adicionar Imagem/Vídeo:" : "Adicionar Imagem:";
     document.getElementById('tips').style.display = currentTab==='vibe'? 'block' : 'none';
     document.getElementById('infoTitleDiv').style.display = currentTab==='info'? 'block' : 'none';
     document.getElementById('text').placeholder = currentTab==='info'? 'Conteúdo da notícia...' : 'Criar post...';
     document.documentElement.style.setProperty('--accent', `var(${current.color})`);
     document.body.style.background = current.id==='talk'? '#fff' : current.id==='info'? '#FFF0F5' : 'var(--bg)';
   }
+
   function toggleLike(id) {
     const post = posts.find(p => p.id === id);
     if(!post) return;
     post.liked =!post.liked;
+    post.likes = post.liked? post.likes + 1 : post.likes - 1;
     localStorage.setItem('posts', JSON.stringify(posts));
     renderPosts();
   }
+
   function editCount(id, type, el) {
     const val = parseInt(el.value.replace(/[^0-9]/g,'')) || 0;
     const post = posts.find(p => p.id === id);
     if(!post) return;
     post[type] = val;
-    post.liked = false;
     localStorage.setItem('posts', JSON.stringify(posts));
   }
+
   function saveMyAccount() {
     const name = document.getElementById('myName').value.trim();
     if(name) {
@@ -208,6 +241,7 @@
       renderPosts(); renderStories();
     }
   }
+
   function renderStories() {
     const sDiv = document.getElementById('stories');
     sDiv.innerHTML = "";
@@ -220,6 +254,7 @@
       `;
     });
   }
+
   function changeMyAvatar(e) {
     const file = e.target.files[0];
     if(!file) return;
@@ -231,6 +266,7 @@
     }
     reader.readAsDataURL(file);
   }
+
   function addAccount() {
     const name = document.getElementById('accountName').value.trim();
     const file = document.getElementById('accountImg').files[0];
@@ -246,15 +282,33 @@
     }
     reader.readAsDataURL(file);
   }
+
+  function addVibeAccount() {
+    const name = document.getElementById('vibeAccountName').value.trim();
+    const file = document.getElementById('vibeAccountImg').files[0];
+    if(!name ||!file) return alert("Coloca nome e imagem");
+    const user = name.toLowerCase().replace(/\s/g,'');
+    const reader = new FileReader();
+    reader.onload = e => {
+      accounts.push({name:user, img:e.target.result, user});
+      localStorage.setItem('accounts', JSON.stringify(accounts));
+      renderStories();
+      document.getElementById('vibeAccountName').value = "";
+      document.getElementById('vibeAccountImg').value = "";
+      alert("Conta Vibe adicionada! Agora posta com ela");
+    }
+    reader.readAsDataURL(file);
+  }
+
   function addTalkAccount() {
     const name = document.getElementById('talkAccountName').value.trim();
     const postText = document.getElementById('talkAccountPost').value.trim();
     const file = document.getElementById('talkAccountImg').files[0];
     if(!name ||!postText) return alert("Coloca nome e o que ela vai falar");
     const user = name.toLowerCase().replace(/\s/g,'');
-    const save = (imgData) => {
-      accounts.push({name:user, img:imgData, user});
-      posts.unshift({id:Date.now(), tab:'talk', user:user, userId:user, text:postText, media:null, likes:Math.floor(Math.random()*500), liked:false, comments:Math.floor(Math.random()*100), reposts:Math.floor(Math.random()*50)});
+    const save = (mediaData, type) => {
+      accounts.push({name:user, img:type==='image'?mediaData:"", user});
+      posts.unshift({id:Date.now(), tab:'talk', user:user, userId:user, text:postText, media:mediaData, mediaType:type, likes:Math.floor(Math.random()*500), liked:false, comments:Math.floor(Math.random()*100), reposts:Math.floor(Math.random()*50)});
       localStorage.setItem('accounts', JSON.stringify(accounts));
       localStorage.setItem('posts', JSON.stringify(posts));
       renderStories(); renderPosts();
@@ -264,10 +318,11 @@
     }
     if(file) {
       const reader = new FileReader();
-      reader.onload = e => save(e.target.result);
+      reader.onload = e => save(e.target.result, file.type.startsWith('video')? 'video' : 'image');
       reader.readAsDataURL(file);
-    } else save("");
+    } else save("", null);
   }
+
   function openConfig() {
     document.getElementById('myName').value = accounts[0].name;
     const uploadsDiv = document.getElementById('iconUploads');
@@ -285,7 +340,9 @@
     reader.onload = ev => { icons[tabId] = ev.target.result; localStorage.setItem('icons', JSON.stringify(icons)); renderTabs(); }
   }
   function closeConfig() { document.getElementById('configModal').style.display = 'none'; }
+
   function showFeed(tab) { currentTab = tab; renderTabs(); renderPosts(); }
+
   function addPost() {
     const text = document.getElementById('text').value;
     const title = document.getElementById('infoTitle').value;
@@ -312,6 +369,7 @@
       reader.readAsDataURL(file);
     } else savePost(null, null);
   }
+
   function renderPosts() {
     const container = document.getElementById('posts');
     container.innerHTML = "";
@@ -326,7 +384,7 @@
               <div class="vibe-side">
                 <div class="vibe-btn" onclick="toggleLike(${p.id})">
                   <div class="heart ${p.liked?'liked':''}">❤️</div>
-                  <input class="count-edit" value="${p.likes}" onchange="editCount(${p.id},'likes',this)">
+                  <input class="count-edit" value="${p.likes}" onchange="editCount(${p.id},'likes',this)" title="Clique pra editar">
                 </div>
                 <div class="vibe-btn"><div>💬</div><input class="count-edit" value="${p.comments}" onchange="editCount(${p.id},'comments',this)"></div>
                 <div class="vibe-btn"><div>🔄</div><input class="count-edit" value="${p.reposts}" onchange="editCount(${p.id},'reposts',this)"></div>
@@ -334,7 +392,7 @@
               <div class="vibe-info">
                 <div class="vibe-user">
                   <img src="${acc.img || 'https://via.placeholder.com/32'}">
-                  <b>@${p.userId}</b>
+                  <b>@${p.userId || 'voce'}</b>
                 </div>
                 <p>${p.text}</p>
               </div>
@@ -358,7 +416,7 @@
         if(p.mediaType==='video') mediaHTML = `<video class="content" src="${p.media}" controls></video>`;
         container.innerHTML += `
           <div class="post ${p.tab}">
-            <div class="post-header"><img class="avatar" src="${acc.img || 'https://via.placeholder.com/40'}"><div><div class="username">@${p.userId}</div></div></div>
+            <div class="post-header"><img class="avatar" src="${acc.img || 'https://via.placeholder.com/40'}"><div><div class="username">@${p.userId || 'voce'}</div></div></div>
             <p>${p.text}</p>
             ${mediaHTML}
             <div class="post-actions">
@@ -371,6 +429,7 @@
       }
     });
   }
+
   renderTabs(); renderStories(); renderPosts();
 </script>
 </body>
