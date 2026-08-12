@@ -26,7 +26,7 @@
 .post { background: var(--card); border-radius: 12px; padding: 12px; margin-bottom: 16px; position:relative; border:1px solid #1f232b; }
 .post.snap { border-left: 4px solid var(--snap); }
 .post.vibe { background:#000; border-radius:0; height: 100vh; max-height: 800px; width: 100%; max-width: 420px; margin: 0 auto 16px; padding:0; border:none; overflow:hidden; position:relative; }
-.post.talk { border-radius:0; border-left: 4px solid #ddd; background: var(--talk); color:#000; border:1px solid #ddd; }
+.post.talk { border-radius:8px; border: 1px solid #ddd; background: var(--talk); color:#000; }
 .post.talk.username,.post.talk p { color:#000; }
 .post.info { border-radius:16px; border:1px solid #FFB6C1; background: var(--info); color:#333; padding:16px; }
 .post.info.post-header { display:none; }
@@ -142,6 +142,20 @@
       <input type="text" id="talkAccountPost" placeholder="O que ela vai falar?">
       <input type="file" id="talkAccountImg" accept="image/*,video/*">
       <button onclick="addTalkAccount()">Adicionar Conta com Post</button>
+    </div>
+    <div class="upload-group">
+      <h3>Adicionar Post com Vídeo - VibeClip</h3>
+      <input type="text" id="vibePostUser" placeholder="Usuário que vai postar">
+      <input type="text" id="vibePostText" placeholder="Legenda do vídeo">
+      <input type="file" id="vibePostMedia" accept="video/*,image/*">
+      <button onclick="addVibePost()">Postar no VibeClip</button>
+    </div>
+    <div class="upload-group">
+      <h3>Adicionar Post com Vídeo - TalkNow</h3>
+      <input type="text" id="talkPostUser" placeholder="Usuário que vai postar">
+      <input type="text" id="talkPostText" placeholder="Texto do post">
+      <input type="file" id="talkPostMedia" accept="video/*,image/*">
+      <button onclick="addTalkPost()">Postar no TalkNow</button>
     </div>
     <button onclick="closeConfig()" style="width:100%; background:#555;">Salvar e Fechar</button>
   </div>
@@ -295,7 +309,27 @@
       renderStories();
       document.getElementById('vibeAccountName').value = "";
       document.getElementById('vibeAccountImg').value = "";
-      alert("Conta Vibe adicionada! Agora posta com ela");
+      alert("Conta Vibe adicionada!");
+    }
+    reader.readAsDataURL(file);
+  }
+
+  function addVibePost() {
+    const user = document.getElementById('vibePostUser').value.trim().toLowerCase().replace(/\s/g,'');
+    const text = document.getElementById('vibePostText').value.trim();
+    const file = document.getElementById('vibePostMedia').files[0];
+    if(!user ||!text ||!file) return alert("Preencha usuário, legenda e vídeo/imagem");
+    const acc = accounts.find(a=>a.user===user);
+    if(!acc) return alert("Conta não existe. Crie ela primeiro");
+    const reader = new FileReader();
+    reader.onload = e => {
+      posts.unshift({id:Date.now(), tab:'vibe', user:user, userId:user, text:text, media:e.target.result, mediaType:file.type.startsWith('video')? 'video' : 'image', likes:0, liked:false, comments:0, reposts:0});
+      localStorage.setItem('posts', JSON.stringify(posts));
+      document.getElementById('vibePostUser').value = "";
+      document.getElementById('vibePostText').value = "";
+      document.getElementById('vibePostMedia').value = "";
+      alert("Postado no VibeClip!");
+      renderPosts();
     }
     reader.readAsDataURL(file);
   }
@@ -315,6 +349,29 @@
       document.getElementById('talkAccountName').value = "";
       document.getElementById('talkAccountPost').value = "";
       document.getElementById('talkAccountImg').value = "";
+    }
+    if(file) {
+      const reader = new FileReader();
+      reader.onload = e => save(e.target.result, file.type.startsWith('video')? 'video' : 'image');
+      reader.readAsDataURL(file);
+    } else save("", null);
+  }
+
+  function addTalkPost() {
+    const user = document.getElementById('talkPostUser').value.trim().toLowerCase().replace(/\s/g,'');
+    const text = document.getElementById('talkPostText').value.trim();
+    const file = document.getElementById('talkPostMedia').files[0];
+    if(!user ||!text) return alert("Preencha usuário e texto");
+    const acc = accounts.find(a=>a.user===user);
+    if(!acc) return alert("Conta não existe. Crie ela primeiro");
+    const save = (mediaData, type) => {
+      posts.unshift({id:Date.now(), tab:'talk', user:user, userId:user, text:text, media:mediaData, mediaType:type, likes:0, liked:false, comments:0, reposts:0});
+      localStorage.setItem('posts', JSON.stringify(posts));
+      document.getElementById('talkPostUser').value = "";
+      document.getElementById('talkPostText').value = "";
+      document.getElementById('talkPostMedia').value = "";
+      alert("Postado no TalkNow!");
+      renderPosts();
     }
     if(file) {
       const reader = new FileReader();
@@ -413,7 +470,7 @@
       } else {
         let mediaHTML = "";
         if(p.mediaType==='image') mediaHTML = `<img class="content" src="${p.media}">`;
-        if(p.mediaType==='video') mediaHTML = `<video class="content" src="${p.media}" controls></video>`;
+        if(p.mediaType==='video') mediaHTML = `<video class="content" src="${p.media}" autoplay loop muted playsinline controls></video>`;
         container.innerHTML += `
           <div class="post ${p.tab}">
             <div class="post-header"><img class="avatar" src="${acc.img || 'https://via.placeholder.com/40'}"><div><div class="username">@${p.userId || 'voce'}</div></div></div>
