@@ -22,7 +22,7 @@
 .story-circle { width:64px; height:64px; border-radius:50%; padding:3px; background: linear-gradient(45deg, var(--story), #EC4899); display:flex; align-items:center; justify-content:center; }
 .story img { width:100%; height:100%; border-radius:50%; object-fit:cover; border:2px solid var(--card); }
 .story span { font-size:10px; color:var(--muted); max-width:70px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.btn-delete-account { display:none!important; } /* X SUMIU DAQUI */
+.btn-delete-account { position:absolute; top:-5px; right:-5px; background:#ff2d55; color:#fff; border:none; border-radius:50%; width:18px; height:18px; font-size:10px; cursor:pointer; z-index:5; }
 .feed { max-width: 600px; margin: 0 auto; padding: 16px; }
 .post { background: var(--card); border-radius: 12px; padding: 12px; margin-bottom: 16px; position:relative; border:1px solid #1f232b; }
 .post.snap { border-left: 4px solid var(--snap); }
@@ -37,7 +37,7 @@
 .post img.content,.post video.content { width:100%; border-radius:8px; margin:10px 0; max-height:500px; object-fit:cover; }
 .post p { font-size: 15px; line-height: 1.5; white-space: pre-wrap; }
 .post.info h3 { margin-bottom:10px; font-size:18px; font-weight:700; }
-.vibe-container { position:relative; width:100%; height:100%; background:#000; border-radius: 20px; overflow:hidden; }
+.vibe-container { position:relative; width:100%; height:100%; background:#000; }
 .vibe-container video,.vibe-container img { width:100%; height:100%; object-fit:cover; }
 .vibe-side { position:absolute; right:12px; bottom:120px; display:flex; flex-direction:column; gap:22px; align-items:center; z-index:3; }
 .vibe-btn { display:flex; flex-direction:column; align-items:center; cursor:pointer; color:#fff; }
@@ -47,9 +47,9 @@
   @keyframes pop { 0%{transform:scale(1);} 50%{transform:scale(1.6);} 100%{transform:scale(1);} }
 .vibe-info { position:absolute; bottom:80px; left:14px; right:80px; color:#fff; z-index:3; }
 .vibe-info.vibe-user { display:flex; align-items:center; gap:8px; position:absolute; bottom:100px; left:14px; z-index:4; }
-.vibe-info.vibe-user img { width:36px; height:36px; border-radius:50%; border:2px solid var(--vibe); object-fit:cover; aspect-ratio: 1 / 1; box-shadow: 0 0 0 2px #000; } /* FOTO REDONDA IGUAL INSTA */
-.vibe-info b { font-size:16px; text-shadow: 0 2px 6px rgba(0,0,0,0.9); }
-.vibe-info p { margin-top:8px; font-size:14px; text-shadow: 0 2px 6px rgba(0,0,0,0.9); }
+.vibe-info.vibe-user img { width:32px; height:32px; border-radius:50%; border:2px solid #fff; object-fit:cover; }
+.vibe-info b { font-size:16px; text-shadow: 0 2px 6px rgba(0,0,0,0.9); margin-left:40px; }
+.vibe-info p { margin-top:8px; font-size:14px; text-shadow: 0 2px 6px rgba(0,0,0,0.9); margin-left:40px; }
 .vibe-gradient { position:absolute; bottom:0; left:0; right:0; height:280px; background: linear-gradient(transparent, rgba(0,0,0,0.85)); z-index:2; }
 .vibe-sound { position:absolute; right:12px; bottom:400px; z-index:3; background:rgba(0,0,0,0.6); border-radius:50%; width:40px; height:40px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#fff; font-size:20px; }
 .count-edit { background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.2); border-radius:6px; color:inherit; width:55px; text-align:center; font-size:12px; font-weight:bold; padding:2px; }
@@ -87,9 +87,6 @@
 .upload-group h3 { margin-bottom:10px; font-size:15px; }
 .upload-group input { width:100%; margin:6px 0; padding:8px; background:#0a0a0a; border:1px solid #2a2e36; border-radius:6px; color:var(--text); }
 .upload-group button { background:var(--accent); color:#fff; border:none; padding:8px 14px; border-radius:6px; cursor:pointer; margin-top:6px; font-weight:600; }
-.account-list-item { display:flex; align-items:center; justify-content:space-between; padding:8px; background:#0a0a0a; border-radius:8px; margin-bottom:8px; }
-.account-list-item img { width:32px; height:32px; border-radius:50%; object-fit:cover; margin-right:8px; }
-.account-list-item button { background:#ff2d55; color:#fff; border:none; border-radius:6px; padding:4px 10px; cursor:pointer; font-size:12px; }
 </style>
 </head>
 <body>
@@ -124,10 +121,6 @@
       <input type="text" id="myName" placeholder="Seu nome de usuário">
       <input type="file" id="myAvatar" accept="image/*" onchange="changeMyAvatar(event)">
       <button onclick="saveMyAccount()">Salvar Conta</button>
-    </div>
-    <div class="upload-group">
-      <h3>Gerenciar Contas</h3>
-      <div id="accountsList"></div>
     </div>
     <div class="upload-group">
       <h3>Ícones das Abas</h3>
@@ -187,10 +180,6 @@
   let posts = JSON.parse(localStorage.getItem('posts')) || [];
   let icons = JSON.parse(localStorage.getItem('icons')) || {};
 
-  function getAccount(userId) {
-    return accounts.find(a => a.user === userId) || accounts[0];
-  }
-
   function fixUndefined(){
     let mudou = false;
     posts = posts.map(p => {
@@ -223,27 +212,8 @@
       accounts = accounts.filter(a => a.user!== user);
       localStorage.setItem('accounts', JSON.stringify(accounts));
       renderStories();
-      renderAccountsList();
       alert("Conta apagada!");
     }
-  }
-
-  function renderAccountsList() {
-    const list = document.getElementById('accountsList');
-    list.innerHTML = "";
-    accounts.forEach(a => {
-      if(a.user!== 'voce') {
-        list.innerHTML += `
-          <div class="account-list-item">
-            <div style="display:flex; align-items:center;">
-              <img src="${a.img || 'https://via.placeholder.com/32/333/fff?text=@'}" alt="">
-              <span>@${a.user}</span>
-            </div>
-            <button onclick="deleteAccount('${a.user}')">Excluir</button>
-          </div>
-        `;
-      }
-    });
   }
 
   function renderTabs() {
@@ -299,7 +269,7 @@
       accounts[0].user = name.toLowerCase().replace(/\s/g,'');
       localStorage.setItem('accounts', JSON.stringify(accounts));
       alert("Conta salva com sucesso!");
-      renderPosts(); renderStories(); renderAccountsList();
+      renderPosts(); renderStories();
     }
   }
 
@@ -309,6 +279,7 @@
     accounts.forEach(a => {
       sDiv.innerHTML += `
         <div class="story">
+          ${a.user!=='voce'? `<button class="btn-delete-account" onclick="deleteAccount('${a.user}')">×</button>` : ""}
           <div class="story-circle"><img src="${a.img || 'https://via.placeholder.com/64/333/fff?text=@'}" alt=""></div>
           <span>${a.name}</span>
         </div>
@@ -323,7 +294,7 @@
     reader.onload = ev => {
       accounts[0].img = ev.target.result;
       localStorage.setItem('accounts', JSON.stringify(accounts));
-      renderStories(); renderPosts(); renderAccountsList();
+      renderStories(); renderPosts();
     }
     reader.readAsDataURL(file);
   }
@@ -337,7 +308,7 @@
     reader.onload = e => {
       accounts.push({name:user, img:e.target.result, user});
       localStorage.setItem('accounts', JSON.stringify(accounts));
-      renderStories(); renderAccountsList();
+      renderStories();
       document.getElementById('accountName').value = "";
       document.getElementById('accountImg').value = "";
     }
@@ -353,7 +324,7 @@
     reader.onload = e => {
       accounts.push({name:user, img:e.target.result, user});
       localStorage.setItem('accounts', JSON.stringify(accounts));
-      renderStories(); renderAccountsList();
+      renderStories();
       document.getElementById('vibeAccountName').value = "";
       document.getElementById('vibeAccountImg').value = "";
       alert("Conta Vibe adicionada!");
@@ -362,18 +333,20 @@
   }
 
   function addVibePost() {
-    const user = document.getElementById('vibePostUser').value.trim().
-              <button class="action-btn">💬 <input class="count-edit-normal" value="${p.comments}" oninput="editCount(${p.id}, 'comments', this)"></button>
-            </div>
-          </div>
-        `;
-      }
-    });
-  }
-
-  renderTabs(); // ESSA LINHA FAZ AS 4 ABAS APARECEREM
-  renderStories();
-  renderPosts();
-</script>
-</body>
-</html>
+    const user = document.getElementById('vibePostUser').value.trim().toLowerCase().replace(/\s/g,'');
+    const text = document.getElementById('vibePostText').value.trim();
+    const file = document.getElementById('vibePostMedia').files[0];
+    if(!user ||!text ||!file) return alert("Preencha usuário, legenda e vídeo/imagem");
+    const acc = accounts.find(a=>a.user===user);
+    if(!acc) return alert("Conta não existe. Crie ela primeiro");
+    const reader = new FileReader();
+    reader.onload = e => {
+      posts.unshift({id:Date.now(), tab:'vibe', user:user, userId:user, text:text, media:e.target.result, mediaType:file.type.startsWith('video')? 'video' : 'image', likes:0, liked:false, comments:0, reposts:0});
+      localStorage.setItem('posts', JSON.stringify(posts));
+      document.getElementById('vibePostUser').value = "";
+      document.getElementById('vibePostText').value = "";
+      document.getElementById('vibePostMedia').value = "";
+      alert("Postado no VibeClip!");
+      renderPosts();
+    }
+    reader.readAsDataURL(
