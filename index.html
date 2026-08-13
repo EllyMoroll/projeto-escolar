@@ -22,7 +22,7 @@
 .story-circle { width:64px; height:64px; border-radius:50%; padding:3px; background: linear-gradient(45deg, var(--story), #EC4899); display:flex; align-items:center; justify-content:center; }
 .story img { width:100%; height:100%; border-radius:50%; object-fit:cover; border:2px solid var(--card); }
 .story span { font-size:10px; color:var(--muted); max-width:70px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.btn-delete-account { display:none!important; } /* X SUMIU */
+.btn-delete-account { display:none!important; } /* X SUMIU DAQUI */
 .feed { max-width: 600px; margin: 0 auto; padding: 16px; }
 .post { background: var(--card); border-radius: 12px; padding: 12px; margin-bottom: 16px; position:relative; border:1px solid #1f232b; }
 .post.snap { border-left: 4px solid var(--snap); }
@@ -47,7 +47,7 @@
   @keyframes pop { 0%{transform:scale(1);} 50%{transform:scale(1.6);} 100%{transform:scale(1);} }
 .vibe-info { position:absolute; bottom:80px; left:14px; right:80px; color:#fff; z-index:3; }
 .vibe-info.vibe-user { display:flex; align-items:center; gap:8px; position:absolute; bottom:100px; left:14px; z-index:4; }
-.vibe-info.vibe-user img { width:36px; height:36px; border-radius:50%; border:2px solid var(--vibe); object-fit:cover; aspect-ratio: 1 / 1; box-shadow: 0 0 0 2px #000; } /* FOTO REDONDA */
+.vibe-info.vibe-user img { width:36px; height:36px; border-radius:50%; border:2px solid var(--vibe); object-fit:cover; aspect-ratio: 1 / 1; box-shadow: 0 0 0 2px #000; } /* FOTO REDONDA IGUAL INSTA */
 .vibe-info b { font-size:16px; text-shadow: 0 2px 6px rgba(0,0,0,0.9); }
 .vibe-info p { margin-top:8px; font-size:14px; text-shadow: 0 2px 6px rgba(0,0,0,0.9); }
 .vibe-gradient { position:absolute; bottom:0; left:0; right:0; height:280px; background: linear-gradient(transparent, rgba(0,0,0,0.85)); z-index:2; }
@@ -322,7 +322,47 @@
     const reader = new FileReader();
     reader.onload = ev => {
       accounts[0].img = ev.target.result;
-      localStorage.setItem('accounts',
+      localStorage.setItem('accounts', JSON.stringify(accounts));
+      renderStories(); renderPosts(); renderAccountsList();
+    }
+    reader.readAsDataURL(file);
+  }
+
+  function addAccount() {
+    const name = document.getElementById('accountName').value.trim();
+    const file = document.getElementById('accountImg').files[0];
+    if(!name ||!file) return alert("Coloca nome e imagem");
+    const user = name.toLowerCase().replace(/\s/g,'');
+    const reader = new FileReader();
+    reader.onload = e => {
+      accounts.push({name:user, img:e.target.result, user});
+      localStorage.setItem('accounts', JSON.stringify(accounts));
+      renderStories(); renderAccountsList();
+      document.getElementById('accountName').value = "";
+      document.getElementById('accountImg').value = "";
+    }
+    reader.readAsDataURL(file);
+  }
+
+  function addVibeAccount() {
+    const name = document.getElementById('vibeAccountName').value.trim();
+    const file = document.getElementById('vibeAccountImg').files[0];
+    if(!name ||!file) return alert("Coloca nome e imagem");
+    const user = name.toLowerCase().replace(/\s/g,'');
+    const reader = new FileReader();
+    reader.onload = e => {
+      accounts.push({name:user, img:e.target.result, user});
+      localStorage.setItem('accounts', JSON.stringify(accounts));
+      renderStories(); renderAccountsList();
+      document.getElementById('vibeAccountName').value = "";
+      document.getElementById('vibeAccountImg').value = "";
+      alert("Conta Vibe adicionada!");
+    }
+    reader.readAsDataURL(file);
+  }
+
+  function addVibePost() {
+    const user = document.getElementById('vibePostUser').value.trim().
               <button class="action-btn">💬 <input class="count-edit-normal" value="${p.comments}" oninput="editCount(${p.id}, 'comments', this)"></button>
             </div>
           </div>
@@ -331,7 +371,7 @@
     });
   }
 
-  renderTabs();
+  renderTabs(); // ESSA LINHA FAZ AS 4 ABAS APARECEREM
   renderStories();
   renderPosts();
 </script>
