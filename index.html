@@ -6,637 +6,627 @@
 <title>HubSocial</title>
 
 <style>
-  :root {
-    --bg: #0a0a0a;
-    --card: #121212;
-    --text: #e8e8e8;
-    --muted: #8a8f9a;
-    --snap: #FF5A5F;
-    --vibe: #00F2EA;
-    --talk: #FFFFFF;
-    --info: #FFF0F5;
-    --story: #8B5CF6;
-    --accent: var(--snap);
-  }
-
-  * {
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  }
-
-  body {
-    background:var(--bg);
-    color:var(--text);
-    padding-bottom:80px;
-    transition:background 0.3s;
-  }
-
-  header {
-    position:sticky;
-    top:0;
-    z-index:10;
-    background:var(--card);
-    padding:14px 16px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    border-bottom:1px solid #2a2e36;
-  }
-
-  header h1 {
-    font-size:20px;
-    font-weight:700;
-    transition:color 0.3s;
-  }
-
-  .header-buttons {
-    display:flex;
-    gap:8px;
-  }
-
-  #btnConfig, #btnClear, #btnFix {
-    background:none;
-    border:none;
-    color:var(--muted);
-    cursor:pointer;
-    font-size:20px;
-    padding:4px;
-  }
-
-  .stories {
-    display:flex;
-    gap:12px;
-    padding:12px 16px;
-    overflow-x:auto;
-    background:var(--card);
-    border-bottom:1px solid #2a2e36;
-  }
-
-  .stories::-webkit-scrollbar {
-    display:none;
-  }
-
-  .story {
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:4px;
-    min-width:70px;
-    cursor:pointer;
-    position:relative;
-  }
-
-  .story-circle {
-    width:64px;
-    height:64px;
-    border-radius:50%;
-    padding:3px;
-    background:linear-gradient(45deg,var(--story),#EC4899);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-  }
-
-  .story img {
-    width:100%;
-    height:100%;
-    border-radius:50%;
-    object-fit:cover;
-    border:2px solid var(--card);
-  }
-
-  .story span {
-    font-size:10px;
-    color:var(--muted);
-    max-width:70px;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
-  }
-
-  .btn-delete-account {
-    position:absolute;
-    top:-5px;
-    right:-5px;
-    background:#ff2d55;
-    color:#fff;
-    border:none;
-    border-radius:50%;
-    width:18px;
-    height:18px;
-    font-size:10px;
-    cursor:pointer;
-    z-index:5;
-  }
-
-  .feed {
-    max-width:600px;
-    margin:0 auto;
-    padding:16px;
-  }
-
-  .post {
-    background:var(--card);
-    border-radius:12px;
-    padding:12px;
-    margin-bottom:16px;
-    position:relative;
-    border:1px solid #1f232b;
-  }
-
-  .post.snap {
-    border-left:4px solid var(--snap);
-  }
-
-  .post.vibe {
-    background:#000;
-    border-radius:0;
-    height:100vh;
-    max-height:800px;
-    width:100%;
-    max-width:420px;
-    margin:0 auto 16px;
-    padding:0;
-    border:none;
-    overflow:hidden;
-    position:relative;
-  }
-
-  .post.talk {
-    border-radius:8px;
-    border:1px solid #ddd;
-    background:var(--talk);
-    color:#000;
-  }
-
-  .post.talk.username,
-  .post.talk p {
-    color:#000;
-  }
-
-  .post.info {
-    border-radius:16px;
-    border:1px solid #FFB6C1;
-    background:var(--info);
-    color:#333;
-    padding:16px;
-  }
-
-  .post.info.post-header {
-    display:none;
-  }
-
-  .post-header {
-    display:flex;
-    align-items:center;
-    gap:10px;
-    margin-bottom:10px;
-  }
-
-  .avatar {
-    width:40px;
-    height:40px;
-    border-radius:50%;
-    background:#333;
-    object-fit:cover;
-    cursor:pointer;
-    border:2px solid #2a2e36;
-  }
-
-  .username {
-    font-weight:600;
-    font-size:15px;
-  }
-
-  .post img.content,
-  .post video.content {
-    width:100%;
-    border-radius:8px;
-    margin:10px 0;
-    max-height:500px;
-    object-fit:cover;
-  }
-
-  .post p {
-    font-size:15px;
-    line-height:1.5;
-    white-space:pre-wrap;
-  }
-
-  .post.info h3 {
-    margin-bottom:10px;
-    font-size:18px;
-    font-weight:700;
-  }
-
-  .vibe-container {
-    position:relative;
-    width:100%;
-    height:100%;
-    background:#000;
-  }
-
-  .vibe-container video,
-  .vibe-container img {
-    width:100%;
-    height:100%;
-    object-fit:cover;
-  }
-
-  .vibe-side {
-    position:absolute;
-    right:12px;
-    bottom:120px;
-    display:flex;
-    flex-direction:column;
-    gap:22px;
-    align-items:center;
-    z-index:3;
-  }
-
-  .vibe-btn {
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    cursor:pointer;
-    color:#fff;
-  }
-
-  .vibe-btn div {
-    font-size:30px;
-    filter:drop-shadow(0 2px 6px rgba(0,0,0,0.9));
-  }
-
-  .vibe-btn.count-edit {
-    font-size:14px;
-    font-weight:bold;
-    text-shadow:0 2px 6px rgba(0,0,0,0.9);
-    margin-top:4px;
-    background:rgba(0,0,0,0.5);
-    border:1px solid #fff;
-    border-radius:8px;
-    width:60px;
-    text-align:center;
-    padding:3px;
-    color:#fff;
-  }
-
-  .heart.liked {
-    color:#ff2d55;
-    animation:pop 0.3s;
-  }
-
-  @keyframes pop {
-    0% { transform:scale(1); }
-    50% { transform:scale(1.6); }
-    100% { transform:scale(1); }
-  }
-
-  /* VIBECLIP - FOTO PEQUENA E REDONDA AO LADO DO NOME */
-  .vibe-info {
-    position:absolute;
-    bottom:80px;
-    left:14px;
-    right:80px;
-    color:#fff;
-    z-index:3;
-  }
-
-  .vibe-user {
-    display:flex;
-    align-items:center;
-    gap:8px;
-    margin-bottom:8px;
-  }
-
-  .vibe-user img {
-    width:32px;
-    height:32px;
-    min-width:32px;
-    border-radius:50%;
-    border:2px solid #fff;
-    object-fit:cover;
-  }
-
-  .vibe-user b {
-    font-size:16px;
-    color:#fff;
-    text-shadow:0 2px 6px rgba(0,0,0,0.9);
-  }
-
-  .vibe-info p {
-    margin:0;
-    font-size:14px;
-    color:#fff;
-    text-shadow:0 2px 6px rgba(0,0,0,0.9);
-  }
-
-  .vibe-gradient {
-    position:absolute;
-    bottom:0;
-    left:0;
-    right:0;
-    height:280px;
-    background:linear-gradient(transparent,rgba(0,0,0,0.85));
-    z-index:2;
-  }
-
-  .vibe-sound {
-    position:absolute;
-    right:12px;
-    bottom:400px;
-    z-index:3;
-    background:rgba(0,0,0,0.6);
-    border-radius:50%;
-    width:40px;
-    height:40px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    cursor:pointer;
-    color:#fff;
-    font-size:20px;
-  }
-
-  .count-edit {
-    background:rgba(0,0,0,0.3);
-    border:1px solid rgba(255,255,255,0.2);
-    border-radius:6px;
-    color:inherit;
-    width:55px;
-    text-align:center;
-    font-size:12px;
-    font-weight:bold;
-    padding:2px;
-  }
-
-  .count-edit:focus {
-    outline:2px solid var(--vibe);
-    background:rgba(0,0,0,0.5);
-  }
-
-  .post-actions {
-    display:flex;
-    gap:8px;
-    margin-top:10px;
-    justify-content:space-around;
-    padding-top:10px;
-    border-top:1px solid #2a2e36;
-  }
-
-  .action-btn {
-    background:none;
-    border:none;
-    color:var(--muted);
-    cursor:pointer;
-    font-size:14px;
-    display:flex;
-    align-items:center;
-    gap:6px;
-    padding:6px 10px;
-    border-radius:8px;
-    transition:background 0.2s;
-  }
-
-  .action-btn:hover {
-    background:#1f232b;
-  }
-
-  .action-btn.liked {
-    color:#ff2d55;
-  }
-
-  .post.talk.action-btn {
-    color:#555;
-  }
-
-  .post.talk.action-btn:hover {
-    background:#e0e0e0;
-  }
-
-  .post.info.post-actions {
-    display:none;
-  }
-
-  .count-edit-normal {
-    background:#1f232b;
-    border:1px solid #2a2e36;
-    border-radius:6px;
-    color:inherit;
-    width:55px;
-    text-align:center;
-    font-size:14px;
-    padding:3px;
-  }
-
-  .count-edit-normal:focus {
-    outline:2px solid var(--accent);
-  }
-
-  .composer {
-    background:var(--card);
-    padding:14px;
-    border-radius:12px;
-    margin-top:20px;
-    border:1px dashed #2a2e36;
-  }
-
-  .post.talk.composer {
-    background:#f5f5f5;
-    border-color:#ddd;
-  }
-
-  .post.info.composer {
-    background:#FFE4E1;
-    border-color:#FFB6C1;
-  }
-
-  .composer textarea {
-    width:100%;
-    background:#0a0a0a;
-    border:1px solid #2a2e36;
-    border-radius:8px;
-    padding:10px;
-    color:var(--text);
-    resize:none;
-    font-size:15px;
-    margin-bottom:8px;
-  }
-
-  .post.talk.composer textarea {
-    background:#fff;
-    color:#000;
-    border-color:#ddd;
-  }
-
-  .post.info.composer textarea {
-    background:#fff;
-    color:#000;
-    border-color:#FFB6C1;
-  }
-
-  .composer input[type="file"] {
-    margin:8px 0;
-    color:var(--muted);
-    font-size:12px;
-  }
-
-  .composer button {
-    background:var(--accent);
-    color:white;
-    border:none;
-    padding:10px 18px;
-    border-radius:8px;
-    cursor:pointer;
-    font-weight:700;
-    width:100%;
-    font-size:15px;
-  }
-
-  .composer button:disabled {
-    opacity:0.6;
-    cursor:not-allowed;
-  }
-
-  #mediaLabel {
-    font-size:12px;
-    color:var(--muted);
-    display:block;
-    margin-bottom:4px;
-  }
-
-  .info-title-input {
-    width:100%;
-    background:#fff;
-    border:1px solid #FFB6C1;
-    border-radius:8px;
-    padding:10px;
-    color:#000;
-    margin-bottom:8px;
-    font-weight:700;
-    font-size:15px;
-  }
-
-  .tips {
-    font-size:11px;
-    color:var(--muted);
-    margin:4px 0 8px;
-  }
-
-  .tabs {
-    display:flex;
-    justify-content:space-around;
-    background:var(--card);
-    position:fixed;
-    bottom:0;
-    left:0;
-    right:0;
-    border-top:1px solid #2a2e36;
-    padding:8px 0;
-    z-index:10;
-  }
-
-  .tab {
-    flex:1;
-    text-align:center;
-    cursor:pointer;
-    padding:6px;
-    color:var(--muted);
-    font-size:11px;
-    font-weight:500;
-    transition:color 0.2s;
-  }
-
-  .tab.active.snap {
-    color:var(--snap);
-  }
-
-  .tab.active.vibe {
-    color:var(--vibe);
-  }
-
-  .tab.active.talk {
-    color:#000;
-    background:#eee;
-    border-radius:8px;
-    margin:0 4px;
-  }
-
-  .tab.active.info {
-    color:#FF69B4;
-  }
-
-  .tab img {
-    width:26px;
-    height:26px;
-    display:block;
-    margin:0 auto 4px;
-    border-radius:6px;
-    object-fit:cover;
-  }
-
-  .modal {
-    position:fixed;
-    top:0;
-    left:0;
-    right:0;
-    bottom:0;
-    background:rgba(0,0,0,0.85);
-    display:none;
-    justify-content:center;
-    align-items:center;
-    z-index:20;
-    padding:16px;
-  }
-
-  .modal-content {
-    background:var(--card);
-    padding:20px;
-    border-radius:16px;
-    width:100%;
-    max-width:420px;
-    max-height:85vh;
-    overflow-y:auto;
-    border:1px solid #2a2e36;
-  }
-
-  .modal-content h2 {
-    margin-bottom:16px;
-  }
-
-  .upload-group {
-    margin-bottom:16px;
-    border-bottom:1px solid #2a2e36;
-    padding-bottom:16px;
-  }
-
-  .upload-group h3 {
-    margin-bottom:10px;
-    font-size:15px;
-  }
-
-  .upload-group input {
-    width:100%;
-    margin:6px 0;
-    padding:8px;
-    background:#0a0a0a;
-    border:1px solid #2a2e36;
-    border-radius:6px;
-    color:var(--text);
-  }
-
-  .upload-group button {
-    background:var(--accent);
-    color:#fff;
-    border:none;
-    padding:8px 14px;
-    border-radius:6px;
-    cursor:pointer;
-    margin-top:6px;
-    font-weight:600;
-  }
+:root {
+  --bg: #0a0a0a;
+  --card: #121212;
+  --text: #e8e8e8;
+  --muted: #8a8f9a;
+  --snap: #FF5A5F;
+  --vibe: #00F2EA;
+  --talk: #FFFFFF;
+  --info: #FFF0F5;
+  --story: #8B5CF6;
+  --accent: var(--snap);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  padding-bottom: 80px;
+  transition: background 0.3s;
+}
+
+header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--card);
+  padding: 14px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #2a2e36;
+}
+
+header h1 {
+  font-size: 20px;
+  font-weight: 700;
+  transition: color 0.3s;
+}
+
+.header-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+#btnConfig,
+#btnClear,
+#btnFix {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 20px;
+  padding: 4px;
+}
+
+.stories {
+  display: flex;
+  gap: 12px;
+  padding: 12px 16px;
+  overflow-x: auto;
+  background: var(--card);
+  border-bottom: 1px solid #2a2e36;
+}
+
+.stories::-webkit-scrollbar {
+  display: none;
+}
+
+.story {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 70px;
+  cursor: pointer;
+  position: relative;
+}
+
+.story-circle {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  padding: 3px;
+  background: linear-gradient(45deg, var(--story), #EC4899);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.story img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--card);
+}
+
+.story span {
+  font-size: 10px;
+  color: var(--muted);
+  max-width: 70px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.btn-delete-account {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #ff2d55;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 10px;
+  cursor: pointer;
+  z-index: 5;
+}
+
+.feed {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.post {
+  background: var(--card);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 16px;
+  position: relative;
+  border: 1px solid #1f232b;
+}
+
+.post.snap {
+  border-left: 4px solid var(--snap);
+}
+
+.post.vibe {
+  background: #000;
+  border-radius: 0;
+  height: 100vh;
+  max-height: 800px;
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto 16px;
+  padding: 0;
+  border: none;
+  overflow: hidden;
+  position: relative;
+}
+
+.post.talk {
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: var(--talk);
+  color: #000;
+}
+
+.post.talk.username,
+.post.talk p {
+  color: #000;
+}
+
+.post.info {
+  border-radius: 16px;
+  border: 1px solid #FFB6C1;
+  background: var(--info);
+  color: #333;
+  padding: 16px;
+}
+
+.post.info.post-header {
+  display: none;
+}
+
+.post-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #333;
+  object-fit: cover;
+  cursor: pointer;
+  border: 2px solid #2a2e36;
+}
+
+.username {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.post img.content,
+.post video.content {
+  width: 100%;
+  border-radius: 8px;
+  margin: 10px 0;
+  max-height: 500px;
+  object-fit: cover;
+}
+
+.post p {
+  font-size: 15px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.post.info h3 {
+  margin-bottom: 10px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/* VIBECLIP */
+
+.vibe-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #000;
+}
+
+.vibe-container video,
+.vibe-container > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.vibe-side {
+  position: absolute;
+  right: 12px;
+  bottom: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  align-items: center;
+  z-index: 3;
+}
+
+.vibe-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  color: #fff;
+}
+
+.vibe-btn div {
+  font-size: 30px;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.9));
+}
+
+.heart.liked {
+  color: #ff2d55;
+  animation: pop 0.3s;
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.6);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* FOTO DE PERFIL PEQUENA E REDONDA AO LADO DO NOME */
+
+.vibe-info {
+  position: absolute;
+  bottom: 80px;
+  left: 14px;
+  right: 80px;
+  color: #fff;
+  z-index: 3;
+}
+
+.vibe-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.vibe-user img {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  object-fit: cover;
+}
+
+.vibe-user b {
+  font-size: 16px;
+  color: #fff;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.9);
+}
+
+.vibe-info p {
+  margin: 0;
+  font-size: 14px;
+  color: #fff;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.9);
+}
+
+.vibe-gradient {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 280px;
+  background: linear-gradient(
+    transparent,
+    rgba(0,0,0,0.85)
+  );
+  z-index: 2;
+}
+
+.vibe-sound {
+  position: absolute;
+  right: 12px;
+  bottom: 400px;
+  z-index: 3;
+  background: rgba(0,0,0,0.6);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #fff;
+  font-size: 20px;
+}
+
+.count-edit {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 6px;
+  color: inherit;
+  width: 55px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 2px;
+}
+
+.count-edit:focus {
+  outline: 2px solid var(--vibe);
+  background: rgba(0,0,0,0.5);
+}
+
+.post-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  justify-content: space-around;
+  padding-top: 10px;
+  border-top: 1px solid #2a2e36;
+}
+
+.action-btn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.action-btn:hover {
+  background: #1f232b;
+}
+
+.action-btn.liked {
+  color: #ff2d55;
+}
+
+.count-edit-normal {
+  background: #1f232b;
+  border: 1px solid #2a2e36;
+  border-radius: 6px;
+  color: inherit;
+  width: 55px;
+  text-align: center;
+  font-size: 14px;
+  padding: 3px;
+}
+
+.count-edit-normal:focus {
+  outline: 2px solid var(--accent);
+}
+
+.composer {
+  background: var(--card);
+  padding: 14px;
+  border-radius: 12px;
+  margin-top: 20px;
+  border: 1px dashed #2a2e36;
+}
+
+.post.talk.composer {
+  background: #f5f5f5;
+  border-color: #ddd;
+}
+
+.post.info.composer {
+  background: #FFE4E1;
+  border-color: #FFB6C1;
+}
+
+.composer textarea {
+  width: 100%;
+  background: #0a0a0a;
+  border: 1px solid #2a2e36;
+  border-radius: 8px;
+  padding: 10px;
+  color: var(--text);
+  resize: none;
+  font-size: 15px;
+  margin-bottom: 8px;
+}
+
+.post.talk.composer textarea {
+  background: #fff;
+  color: #000;
+  border-color: #ddd;
+}
+
+.post.info.composer textarea {
+  background: #fff;
+  color: #000;
+  border-color: #FFB6C1;
+}
+
+.composer input[type="file"] {
+  margin: 8px 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.composer button {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  width: 100%;
+  font-size: 15px;
+}
+
+.composer button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+#mediaLabel {
+  font-size: 12px;
+  color: var(--muted);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.info-title-input {
+  width: 100%;
+  background: #fff;
+  border: 1px solid #FFB6C1;
+  border-radius: 8px;
+  padding: 10px;
+  color: #000;
+  margin-bottom: 8px;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.tips {
+  font-size: 11px;
+  color: var(--muted);
+  margin: 4px 0 8px;
+}
+
+.tabs {
+  display: flex;
+  justify-content: space-around;
+  background: var(--card);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border-top: 1px solid #2a2e36;
+  padding: 8px 0;
+  z-index: 10;
+}
+
+.tab {
+  flex: 1;
+  text-align: center;
+  cursor: pointer;
+  padding: 6px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.tab.active.snap {
+  color: var(--snap);
+}
+
+.tab.active.vibe {
+  color: var(--vibe);
+}
+
+.tab.active.talk {
+  color: #000;
+  background: #eee;
+  border-radius: 8px;
+  margin: 0 4px;
+}
+
+.tab.active.info {
+  color: #FF69B4;
+}
+
+.tab img {
+  width: 26px;
+  height: 26px;
+  display: block;
+  margin: 0 auto 4px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.85);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 20;
+  padding: 16px;
+}
+
+.modal-content {
+  background: var(--card);
+  padding: 20px;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 420px;
+  max-height: 85vh;
+  overflow-y: auto;
+  border: 1px solid #2a2e36;
+}
+
+.modal-content h2 {
+  margin-bottom: 16px;
+}
+
+.upload-group {
+  margin-bottom: 16px;
+  border-bottom: 1px solid #2a2e36;
+  padding-bottom: 16px;
+}
+
+.upload-group h3 {
+  margin-bottom: 10px;
+  font-size: 15px;
+}
+
+.upload-group input {
+  width: 100%;
+  margin: 6px 0;
+  padding: 8px;
+  background: #0a0a0a;
+  border: 1px solid #2a2e36;
+  border-radius: 6px;
+  color: var(--text);
+}
+
+.upload-group button {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 6px;
+  font-weight: 600;
+}
 </style>
 </head>
 
@@ -692,7 +682,6 @@
     </div>
 
     <button onclick="addPost()">Postar</button>
-
   </div>
 </div>
 
@@ -720,7 +709,9 @@
         onchange="changeMyAvatar(event)"
       >
 
-      <button onclick="saveMyAccount()">Salvar Conta</button>
+      <button onclick="saveMyAccount()">
+        Salvar Conta
+      </button>
     </div>
 
     <div class="upload-group">
@@ -743,7 +734,9 @@
         accept="image/*"
       >
 
-      <button onclick="addAccount()">Adicionar Conta</button>
+      <button onclick="addAccount()">
+        Adicionar Conta
+      </button>
     </div>
 
     <div class="upload-group">
@@ -858,51 +851,51 @@
 
 const tabsData = [
   {
-    id:'snap',
-    name:'SnapLife',
-    color:'--snap',
-    media:'image/*',
-    showStories:true
+    id: 'snap',
+    name: 'SnapLife',
+    color: '--snap',
+    media: 'image/*',
+    showStories: true
   },
   {
-    id:'vibe',
-    name:'VibeClip',
-    color:'--vibe',
-    media:'video/*,image/*',
-    showStories:false
+    id: 'vibe',
+    name: 'VibeClip',
+    color: '--vibe',
+    media: 'video/*,image/*',
+    showStories: false
   },
   {
-    id:'talk',
-    name:'TalkNow',
-    color:'--talk',
-    media:'image/*,video/*',
-    showStories:false
+    id: 'talk',
+    name: 'TalkNow',
+    color: '--talk',
+    media: 'image/*,video/*',
+    showStories: false
   },
   {
-    id:'info',
-    name:'InfoFlash',
-    color:'--info',
-    media:'image/*',
-    showStories:false
+    id: 'info',
+    name: 'InfoFlash',
+    color: '--info',
+    media: 'image/*',
+    showStories: false
   }
 ];
 
 let accounts =
   JSON.parse(localStorage.getItem('accounts')) || [
     {
-      name:"voce",
-      img:"",
-      user:"voce"
+      name: "voce",
+      img: "",
+      user: "voce"
     },
     {
-      name:"mariatech",
-      img:"",
-      user:"mariatech"
+      name: "mariatech",
+      img: "",
+      user: "mariatech"
     },
     {
-      name:"joaozinho",
-      img:"",
-      user:"joaozinho"
+      name: "joaozinho",
+      img: "",
+      user: "joaozinho"
     }
   ];
 
@@ -915,13 +908,13 @@ let icons =
   JSON.parse(localStorage.getItem('icons')) || {};
 
 
-function fixUndefined(){
+function fixUndefined() {
 
   let mudou = false;
 
   posts = posts.map(p => {
 
-    if(!p.userId){
+    if (!p.userId) {
 
       p.userId =
         p.user ||
@@ -933,7 +926,7 @@ function fixUndefined(){
     return p;
   });
 
-  if(mudou){
+  if (mudou) {
 
     localStorage.setItem(
       'posts',
@@ -947,14 +940,13 @@ function fixUndefined(){
   } else {
 
     alert("Nada pra corrigir!");
-
   }
 }
 
 
-function clearPosts(){
+function clearPosts() {
 
-  if(confirm("Apagar todos os posts?")){
+  if (confirm("Apagar todos os posts?")) {
 
     localStorage.removeItem('posts');
 
@@ -965,15 +957,24 @@ function clearPosts(){
 }
 
 
-function deleteAccount(user){
+function deleteAccount(user) {
 
-  if(user === 'voce')
-    return alert("Não pode apagar sua conta principal!");
+  if (user === 'voce') {
+    return alert(
+      "Não pode apagar sua conta principal!"
+    );
+  }
 
-  if(confirm(`Apagar a conta @${user}? Os posts dela vão continuar`)){
+  if (
+    confirm(
+      `Apagar a conta @${user}? Os posts dela vão continuar`
+    )
+  ) {
 
     accounts =
-      accounts.filter(a => a.user !== user);
+      accounts.filter(
+        a => a.user !== user
+      );
 
     localStorage.setItem(
       'accounts',
@@ -987,7 +988,7 @@ function deleteAccount(user){
 }
 
 
-function renderTabs(){
+function renderTabs() {
 
   const tabsDiv =
     document.getElementById('tabs');
@@ -997,26 +998,26 @@ function renderTabs(){
   tabsData.forEach(t => {
 
     tabsDiv.innerHTML += `
-
       <div
         class="tab ${currentTab === t.id ? 'active ' + t.id : ''}"
         onclick="showFeed('${t.id}')"
       >
-
         <img
-          src="${icons[t.id] || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjYiIGhlaWdodD0iMjYiIGZpbGw9IiM4YThmOWEiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiLz48L3N2Zz4='}"
+          src="${
+            icons[t.id] ||
+            'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjYiIGhlaWdodD0iMjYiIGZpbGw9IiM4YThmOWEiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiLz48L3N2Zz4='
+          }"
           alt="${t.name}"
         >
-
         ${t.name}
-
       </div>
-
     `;
   });
 
   const current =
-    tabsData.find(t => t.id === currentTab);
+    tabsData.find(
+      t => t.id === currentTab
+    );
 
   document.getElementById(
     'headerTitle'
@@ -1030,7 +1031,9 @@ function renderTabs(){
   document.getElementById(
     'stories'
   ).style.display =
-    current.showStories ? 'flex' : 'none';
+    current.showStories
+      ? 'flex'
+      : 'none';
 
   document.getElementById(
     'media'
@@ -1080,14 +1083,17 @@ function renderTabs(){
 }
 
 
-function toggleLike(id){
+function toggleLike(id) {
 
   const post =
-    posts.find(p => p.id === id);
+    posts.find(
+      p => p.id === id
+    );
 
-  if(!post) return;
+  if (!post) return;
 
-  post.liked = !post.liked;
+  post.liked =
+    !post.liked;
 
   post.likes =
     post.liked
@@ -1103,29 +1109,33 @@ function toggleLike(id){
 }
 
 
-function toggleSound(id){
+function toggleSound(id) {
 
   const video =
     document.getElementById(
       'video-' + id
     );
 
-  if(video)
-    video.muted = !video.muted;
+  if (video) {
+    video.muted =
+      !video.muted;
+  }
 }
 
 
-function editCount(id,type,el){
+function editCount(id, type, el) {
 
   const val =
     parseInt(
-      el.value.replace(/[^0-9]/g,'')
+      el.value.replace(/[^0-9]/g, '')
     ) || 0;
 
   const post =
-    posts.find(p => p.id === id);
+    posts.find(
+      p => p.id === id
+    );
 
-  if(!post) return;
+  if (!post) return;
 
   post[type] = val;
 
@@ -1136,28 +1146,30 @@ function editCount(id,type,el){
 }
 
 
-function saveMyAccount(){
+function saveMyAccount() {
 
   const name =
     document.getElementById(
       'myName'
     ).value.trim();
 
-  if(name){
+  if (name) {
 
     accounts[0].name = name;
 
     accounts[0].user =
       name
         .toLowerCase()
-        .replace(/\s/g,'');
+        .replace(/\s/g, '');
 
     localStorage.setItem(
       'accounts',
       JSON.stringify(accounts)
     );
 
-    alert("Conta salva com sucesso!");
+    alert(
+      "Conta salva com sucesso!"
+    );
 
     renderPosts();
     renderStories();
@@ -1165,7 +1177,7 @@ function saveMyAccount(){
 }
 
 
-function renderStories(){
+function renderStories() {
 
   const sDiv =
     document.getElementById(
@@ -1177,11 +1189,1024 @@ function renderStories(){
   accounts.forEach(a => {
 
     sDiv.innerHTML += `
-
       <div class="story">
 
         ${
           a.user !== 'voce'
             ? `
               <button
-                class="btn-
+                class="btn-delete-account"
+                onclick="deleteAccount('${a.user}')"
+              >
+                ×
+              </button>
+            `
+            : ''
+        }
+
+        <div class="story-circle">
+
+          <img
+            src="${
+              a.img ||
+              'https://via.placeholder.com/64/333/fff?text=@'
+            }"
+            alt=""
+          >
+
+        </div>
+
+        <span>
+          ${a.name}
+        </span>
+
+      </div>
+    `;
+  });
+}
+
+
+function changeMyAvatar(e) {
+
+  const file =
+    e.target.files[0];
+
+  if (!file) return;
+
+  const reader =
+    new FileReader();
+
+  reader.onload = ev => {
+
+    accounts[0].img =
+      ev.target.result;
+
+    localStorage.setItem(
+      'accounts',
+      JSON.stringify(accounts)
+    );
+
+    renderStories();
+    renderPosts();
+  };
+
+  reader.readAsDataURL(file);
+}
+
+
+function addAccount() {
+
+  const name =
+    document.getElementById(
+      'accountName'
+    ).value.trim();
+
+  const file =
+    document.getElementById(
+      'accountImg'
+    ).files[0];
+
+  if (!name || !file) {
+    return alert(
+      "Coloca nome e imagem"
+    );
+  }
+
+  const user =
+    name
+      .toLowerCase()
+      .replace(/\s/g, '');
+
+  const reader =
+    new FileReader();
+
+  reader.onload = e => {
+
+    accounts.push({
+      name: user,
+      img: e.target.result,
+      user
+    });
+
+    localStorage.setItem(
+      'accounts',
+      JSON.stringify(accounts)
+    );
+
+    renderStories();
+
+    document.getElementById(
+      'accountName'
+    ).value = "";
+
+    document.getElementById(
+      'accountImg'
+    ).value = "";
+  };
+
+  reader.readAsDataURL(file);
+}
+
+
+function addVibeAccount() {
+
+  const name =
+    document.getElementById(
+      'vibeAccountName'
+    ).value.trim();
+
+  const file =
+    document.getElementById(
+      'vibeAccountImg'
+    ).files[0];
+
+  if (!name || !file) {
+    return alert(
+      "Coloca nome e imagem"
+    );
+  }
+
+  const user =
+    name
+      .toLowerCase()
+      .replace(/\s/g, '');
+
+  const reader =
+    new FileReader();
+
+  reader.onload = e => {
+
+    accounts.push({
+      name: user,
+      img: e.target.result,
+      user
+    });
+
+    localStorage.setItem(
+      'accounts',
+      JSON.stringify(accounts)
+    );
+
+    renderStories();
+
+    document.getElementById(
+      'vibeAccountName'
+    ).value = "";
+
+    document.getElementById(
+      'vibeAccountImg'
+    ).value = "";
+
+    alert(
+      "Conta Vibe adicionada!"
+    );
+  };
+
+  reader.readAsDataURL(file);
+}
+
+
+function addVibePost() {
+
+  const user =
+    document.getElementById(
+      'vibePostUser'
+    ).value
+      .trim()
+      .toLowerCase()
+      .replace(/\s/g, '');
+
+  const text =
+    document.getElementById(
+      'vibePostText'
+    ).value.trim();
+
+  const file =
+    document.getElementById(
+      'vibePostMedia'
+    ).files[0];
+
+  if (!user || !text || !file) {
+    return alert(
+      "Preencha usuário, legenda e vídeo/imagem"
+    );
+  }
+
+  const acc =
+    accounts.find(
+      a => a.user === user
+    );
+
+  if (!acc) {
+    return alert(
+      "Conta não existe. Crie ela primeiro"
+    );
+  }
+
+  const reader =
+    new FileReader();
+
+  reader.onload = e => {
+
+    posts.unshift({
+      id: Date.now(),
+      tab: 'vibe',
+      user: user,
+      userId: user,
+      text: text,
+      media: e.target.result,
+      mediaType:
+        file.type.startsWith('video')
+          ? 'video'
+          : 'image',
+      likes: 0,
+      liked: false,
+      comments: 0,
+      reposts: 0
+    });
+
+    localStorage.setItem(
+      'posts',
+      JSON.stringify(posts)
+    );
+
+    document.getElementById(
+      'vibePostUser'
+    ).value = "";
+
+    document.getElementById(
+      'vibePostText'
+    ).value = "";
+
+    document.getElementById(
+      'vibePostMedia'
+    ).value = "";
+
+    alert(
+      "Postado no VibeClip!"
+    );
+
+    renderPosts();
+  };
+
+  reader.readAsDataURL(file);
+}
+
+
+function addTalkAccount() {
+
+  const name =
+    document.getElementById(
+      'talkAccountName'
+    ).value.trim();
+
+  const postText =
+    document.getElementById(
+      'talkAccountPost'
+    ).value.trim();
+
+  const file =
+    document.getElementById(
+      'talkAccountImg'
+    ).files[0];
+
+  if (!name || !postText) {
+    return alert(
+      "Coloca nome e o que ela vai falar"
+    );
+  }
+
+  const user =
+    name
+      .toLowerCase()
+      .replace(/\s/g, '');
+
+  const save =
+    (mediaData, type) => {
+
+      accounts.push({
+        name: user,
+        img:
+          type === 'image'
+            ? mediaData
+            : "",
+        user
+      });
+
+      posts.unshift({
+        id: Date.now(),
+        tab: 'talk',
+        user: user,
+        userId: user,
+        text: postText,
+        media: mediaData,
+        mediaType: type,
+        likes:
+          Math.floor(
+            Math.random() * 500
+          ),
+        liked: false,
+        comments:
+          Math.floor(
+            Math.random() * 100
+          ),
+        reposts:
+          Math.floor(
+            Math.random() * 50
+          )
+      });
+
+      localStorage.setItem(
+        'accounts',
+        JSON.stringify(accounts)
+      );
+
+      localStorage.setItem(
+        'posts',
+        JSON.stringify(posts)
+      );
+
+      renderStories();
+      renderPosts();
+
+      document.getElementById(
+        'talkAccountName'
+      ).value = "";
+
+      document.getElementById(
+        'talkAccountPost'
+      ).value = "";
+
+      document.getElementById(
+        'talkAccountImg'
+      ).value = "";
+    };
+
+  if (file) {
+
+    const reader =
+      new FileReader();
+
+    reader.onload = e => {
+
+      save(
+        e.target.result,
+        file.type.startsWith('video')
+          ? 'video'
+          : 'image'
+      );
+    };
+
+    reader.readAsDataURL(file);
+
+  } else {
+
+    save("", null);
+  }
+}
+
+
+function addTalkPost() {
+
+  const user =
+    document.getElementById(
+      'talkPostUser'
+    ).value
+      .trim()
+      .toLowerCase()
+      .replace(/\s/g, '');
+
+  const text =
+    document.getElementById(
+      'talkPostText'
+    ).value.trim();
+
+  const file =
+    document.getElementById(
+      'talkPostMedia'
+    ).files[0];
+
+  if (!user || !text) {
+    return alert(
+      "Preencha usuário e texto"
+    );
+  }
+
+  const acc =
+    accounts.find(
+      a => a.user === user
+    );
+
+  if (!acc) {
+    return alert(
+      "Conta não existe. Crie ela primeiro"
+    );
+  }
+
+  const save =
+    (mediaData, type) => {
+
+      posts.unshift({
+        id: Date.now(),
+        tab: 'talk',
+        user: user,
+        userId: user,
+        text: text,
+        media: mediaData,
+        mediaType: type,
+        likes: 0,
+        liked: false,
+        comments: 0,
+        reposts: 0
+      });
+
+      localStorage.setItem(
+        'posts',
+        JSON.stringify(posts)
+      );
+
+      document.getElementById(
+        'talkPostUser'
+      ).value = "";
+
+      document.getElementById(
+        'talkPostText'
+      ).value = "";
+
+      document.getElementById(
+        'talkPostMedia'
+      ).value = "";
+
+      alert(
+        "Postado no TalkNow!"
+      );
+
+      renderPosts();
+    };
+
+  if (file) {
+
+    const reader =
+      new FileReader();
+
+    reader.onload = e => {
+
+      save(
+        e.target.result,
+        file.type.startsWith('video')
+          ? 'video'
+          : 'image'
+      );
+    };
+
+    reader.readAsDataURL(file);
+
+  } else {
+
+    save("", null);
+  }
+}
+
+
+function openConfig() {
+
+  document.getElementById(
+    'myName'
+  ).value =
+    accounts[0].name;
+
+  const uploadsDiv =
+    document.getElementById(
+      'iconUploads'
+    );
+
+  uploadsDiv.innerHTML = "";
+
+  tabsData.forEach(t => {
+
+    uploadsDiv.innerHTML += `
+      <label>
+        ${t.name}
+      </label>
+
+      <input
+        type="file"
+        accept="image/*"
+        onchange="uploadIcon(event, '${t.id}')"
+      >
+
+      <br>
+    `;
+  });
+
+  document.getElementById(
+    'configModal'
+  ).style.display =
+    'flex';
+}
+
+
+function uploadIcon(e, tabId) {
+
+  const file =
+    e.target.files[0];
+
+  if (!file) return;
+
+  const reader =
+    new FileReader();
+
+  reader.readAsDataURL(file);
+
+  reader.onload = ev => {
+
+    icons[tabId] =
+      ev.target.result;
+
+    localStorage.setItem(
+      'icons',
+      JSON.stringify(icons)
+    );
+
+    renderTabs();
+  };
+}
+
+
+function closeConfig() {
+
+  document.getElementById(
+    'configModal'
+  ).style.display =
+    'none';
+}
+
+
+function showFeed(tab) {
+
+  currentTab = tab;
+
+  renderTabs();
+  renderPosts();
+}
+
+
+function addPost() {
+
+  const text =
+    document.getElementById(
+      'text'
+    ).value;
+
+  const title =
+    document.getElementById(
+      'infoTitle'
+    ).value;
+
+  const file =
+    document.getElementById(
+      'media'
+    ).files[0];
+
+  const finalText =
+    currentTab === 'info'
+      ? `${title}\n${text}`
+      : text;
+
+  const btn =
+    document.querySelector(
+      '.composer button'
+    );
+
+  const savePost =
+    (mediaData, type) => {
+
+      const acc =
+        accounts[0];
+
+      posts.unshift({
+        id: Date.now(),
+        tab: currentTab,
+        user: acc.user,
+        userId: acc.user,
+        text: finalText,
+        media: mediaData,
+        mediaType: type,
+        likes: 0,
+        liked: false,
+        comments: 0,
+        reposts: 0
+      });
+
+      localStorage.setItem(
+        'posts',
+        JSON.stringify(posts)
+      );
+
+      document.getElementById(
+        'text'
+      ).value = "";
+
+      document.getElementById(
+        'infoTitle'
+      ).value = "";
+
+      document.getElementById(
+        'media'
+      ).value = "";
+
+      btn.innerText = "Postar";
+      btn.disabled = false;
+
+      renderPosts();
+    };
+
+  if (file) {
+
+    if (
+      file.type.startsWith('video') &&
+      file.size > 6 * 1024 * 1024
+    ) {
+
+      return alert(
+        `Vídeo muito grande! ${(file.size / 1024 / 1024).toFixed(1)}MB. Máximo 6MB.\nGrave em 480p e 5s a 10s`
+      );
+    }
+
+    btn.innerText =
+      "⏳ Postando...";
+
+    btn.disabled = true;
+
+    const reader =
+      new FileReader();
+
+    reader.onload = e => {
+
+      savePost(
+        e.target.result,
+        file.type.startsWith('video')
+          ? 'video'
+          : 'image'
+      );
+    };
+
+    reader.readAsDataURL(file);
+
+  } else {
+
+    savePost(null, null);
+  }
+}
+
+
+function renderPosts() {
+
+  const container =
+    document.getElementById(
+      'posts'
+    );
+
+  container.innerHTML = "";
+
+  posts
+    .filter(
+      p => p.tab === currentTab
+    )
+    .forEach(p => {
+
+      const acc =
+        accounts.find(
+          a => a.user === p.userId
+        ) || accounts[0];
+
+
+      /* VIBECLIP */
+
+      if (
+        p.tab === 'vibe' &&
+        p.media
+      ) {
+
+        container.innerHTML += `
+
+          <div class="post vibe">
+
+            <div class="vibe-container">
+
+              ${
+                p.mediaType === 'video'
+
+                  ? `
+                    <video
+                      id="video-${p.id}"
+                      src="${p.media}"
+                      autoplay
+                      loop
+                      playsinline
+                    ></video>
+                  `
+
+                  : `
+                    <img
+                      src="${p.media}"
+                      alt="VibeClip"
+                    >
+                  `
+              }
+
+              <div class="vibe-gradient"></div>
+
+              <div
+                class="vibe-sound"
+                onclick="toggleSound(${p.id})"
+              >
+                🔊
+              </div>
+
+              <div class="vibe-side">
+
+                <div
+                  class="vibe-btn"
+                  onclick="toggleLike(${p.id})"
+                >
+
+                  <div
+                    class="heart ${
+                      p.liked
+                        ? 'liked'
+                        : ''
+                    }"
+                  >
+                    ❤️
+                  </div>
+
+                  <input
+                    class="count-edit"
+                    value="${p.likes}"
+                    onchange="editCount(
+                      ${p.id},
+                      'likes',
+                      this
+                    )"
+                  >
+
+                </div>
+
+                <div class="vibe-btn">
+
+                  <div>💬</div>
+
+                  <input
+                    class="count-edit"
+                    value="${p.comments}"
+                    onchange="editCount(
+                      ${p.id},
+                      'comments',
+                      this
+                    )"
+                  >
+
+                </div>
+
+                <div class="vibe-btn">
+
+                  <div>🔄</div>
+
+                  <input
+                    class="count-edit"
+                    value="${p.reposts}"
+                    onchange="editCount(
+                      ${p.id},
+                      'reposts',
+                      this
+                    )"
+                  >
+
+                </div>
+
+              </div>
+
+
+              <!-- FOTO PEQUENA + NOME -->
+
+              <div class="vibe-info">
+
+                <div class="vibe-user">
+
+                  <img
+                    src="${
+                      acc.img ||
+                      'https://via.placeholder.com/32'
+                    }"
+                    alt="Perfil"
+                  >
+
+                  <b>
+                    @${p.userId || 'voce'}
+                  </b>
+
+                </div>
+
+                <p>
+                  ${p.text}
+                </p>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        `;
+
+
+      /* INFOFLASH */
+
+      } else if (
+        p.tab === 'info'
+      ) {
+
+        const lines =
+          p.text.split('\n');
+
+        const title =
+          lines[0] ||
+          'Título da Notícia';
+
+        const content =
+          lines
+            .slice(1)
+            .join('\n');
+
+        container.innerHTML += `
+
+          <div class="post ${p.tab}">
+
+            <h3>
+              ${title}
+            </h3>
+
+            <p>
+              ${content}
+            </p>
+
+            ${
+              p.mediaType === 'image'
+                ? `
+                  <img
+                    class="content"
+                    src="${p.media}"
+                    alt="Notícia"
+                  >
+                `
+                : ''
+            }
+
+          </div>
+
+        `;
+
+
+      /* SNAP / TALK */
+
+      } else {
+
+        let mediaHTML = "";
+
+        if (
+          p.mediaType === 'image'
+        ) {
+
+          mediaHTML = `
+            <img
+              class="content"
+              src="${p.media}"
+              alt="Post"
+            >
+          `;
+        }
+
+        if (
+          p.mediaType === 'video'
+        ) {
+
+          mediaHTML = `
+            <video
+              class="content"
+              src="${p.media}"
+              autoplay
+              loop
+              muted
+              playsinline
+              controls
+            ></video>
+          `;
+        }
+
+        container.innerHTML += `
+
+          <div class="post ${p.tab}">
+
+            <div class="post-header">
+
+              <img
+                class="avatar"
+                src="${
+                  acc.img ||
+                  'https://via.placeholder.com/40'
+                }"
+                alt="Perfil"
+              >
+
+              <div>
+
+                <div class="username">
+                  @${p.userId || 'voce'}
+                </div>
+
+              </div>
+
+            </div>
+
+            <p>
+              ${p.text}
+            </p>
+
+            ${mediaHTML}
+
+            <div class="post-actions">
+
+              <button
+                class="action-btn ${
+                  p.liked
+                    ? 'liked'
+                    : ''
+                }"
+                onclick="toggleLike(${p.id})"
+              >
+
+                ❤️
+
+                <input
+                  class="count-edit-normal"
+                  value="${p.likes}"
+                  onchange="editCount(
+                    ${p.id},
+                    'likes',
+                    this
+                  )"
+                >
+
+              </button>
+
+              <button class="action-btn">
+
+                💬
+
+                <input
+                  class="count-edit-normal"
+                  value="${p.comments}"
+                  onchange="editCount(
+                    ${p.id},
+                    'comments',
+                    this
+                  )"
+                >
+
+              </button>
+
+              <button class="action-btn">
+
+                🔄
+
+                <input
+                  class="count-edit-normal"
+                  value="${p.reposts}"
+                  onchange="editCount(
+                    ${p.id},
+                    'reposts',
+                    this
+                  )"
+                >
+
+              </button>
+
+            </div>
+
+          </div>
+
+        `;
+      }
+    });
+}
+
+
+renderTabs();
+renderStories();
+renderPosts();
+
+</script>
+
+</body>
+</html>
