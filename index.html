@@ -588,6 +588,51 @@ function addTalkPost() {
 }
 
 
+<script>
+// ... todo seu código igual ...
+
+function renderPosts(){
+  const container = document.getElementById('posts');
+  if(!container) return;
+  container.innerHTML = "";
+  let filtered = posts.filter(p => p.tab === currentTab);
+  if(currentTab === 'talk'){
+    filtered = filtered.filter(p => !hiddenTalkPosts.includes(p.id));
+  }
+  filtered.slice().reverse().forEach(p=>{
+    const acc = accounts.find(a=>a.user===p.userId) || {name:p.userId, img:'', user:p.userId};
+    let html = "";
+    if(p.tab === 'talk'){
+      html = `
+        <div class="post talk" id="post-${p.id}">
+          <div class="talk-top-row">
+            <div class="post-header" style="margin:0">
+              <img class="avatar" src="${acc.img || 'https://via.placeholder.com/40'}">
+              <span class="username" style="color:#000">@${acc.user}</span>
+            </div>
+            <div class="talk-menu-wrap">
+              <button class="talk-dots-btn" onclick="toggleTalkMenu('${p.id}', event)">⋯</button>
+              <div class="talk-dropdown" id="talk-menu-${p.id}">
+                <button onclick="hideTalkPost('${p.id}')">não tenho interesse</button>
+              </div>
+            </div>
+          </div>
+          <p style="color:#000; margin:10px 0">${p.text||''}</p>
+          ${p.media ? (p.media.includes('video') ? `<video class="content" src="${p.media}" controls></video>` : `<img class="content" src="${p.media}">`) : ''}
+          <div class="post-actions" style="border-top:1px solid #ddd; padding-top:10px; display:flex; gap:10px;">
+            <button class="action-btn ${p.liked?'liked':''}" onclick="toggleLike('${p.id}')" style="color:#000">❤️ ${p.likes||0}</button>
+            <button class="action-btn" style="color:#000">💬 ${p.comments||0}</button>
+            <button class="action-btn" style="color:#000">🔄 ${p.shares||0}</button>
+          </div>
+        </div>`;
+    } else {
+      html = `<div class="post ${p.tab}" id="post-${p.id}"><div class="post-header"><img class="avatar" src="${acc.img}"><span class="username">${acc.name}</span></div><p>${p.text||''}</p>${p.media?`<img class="content" src="${p.media}">`:''}</div>`;
+    }
+    container.innerHTML += html;
+  });
+}
+
+
 function openConfig() {
 
   document.getElementById(
