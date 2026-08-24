@@ -1,79 +1,114 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HubSocial</title>
 <style>
-body{ background:#fff; font-family:sans-serif; margin:0; padding-bottom:80px; }
-.post.talk{ background:#fff; border:1px solid #ddd; border-radius:12px; padding:12px; margin:12px; }
-.post-header{ display:flex; align-items:center; gap:10px; }
-.avatar{ width:40px; height:40px; border-radius:50%; object-fit:cover; }
-.talk-top-row{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
-.talk-menu-wrap{ position:relative; }
-.talk-dots-btn{ background:none; border:none; font-size:22px; cursor:pointer; padding:4px 8px; }
-.talk-dropdown{ position:absolute; right:0; top:28px; background:#fff; border:1px solid #ddd; border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,0.15); min-width:180px; display:none; z-index:99; }
-.talk-dropdown.show{ display:block; }
-.talk-dropdown button{ width:100%; background:none; border:none; text-align:left; padding:12px; font-size:14px; }
-.content{ width:100%; border-radius:12px; margin-top:10px; }
-.post-actions{ display:flex; gap:15px; margin-top:12px; border-top:1px solid #ddd; padding-top:10px; }
+:root{--bg:#0a0a0a;--card:#121212;--text:#e8e8e8;--muted:#8a8f9a;--snap:#FF5A5F;--vibe:#00F2EA;--talk:#FFFFFF;--info:#FFF0F5;--story:#8B5CF6;--accent:var(--snap)}
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+body{background:var(--bg);color:var(--text);padding-bottom:80px}
+header{position:sticky;top:0;z-index:10;background:var(--card);padding:14px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #2a2e36}
+.tabs{display:flex;justify-content:space-around;background:var(--card);position:fixed;bottom:0;left:0;right:0;border-top:1px solid #2a2e36;padding:8px 0;z-index:10}
+.tab{flex:1;text-align:center;cursor:pointer;padding:6px;color:var(--muted);font-size:11px}
+.tab.active.talk{color:#000;background:#eee;border-radius:8px}
+.feed{max-width:600px;margin:0 auto;padding:16px}
+.post{background:var(--card);border-radius:12px;padding:12px;margin-bottom:16px;border:1px solid #1f232b}
+.post.talk{background:#fff;color:#000;border:1px solid #ddd}
+.post-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.avatar{width:40px;height:40px;border-radius:50%;object-fit:cover}
+.content{width:100%;border-radius:8px;margin:10px 0;max-height:500px;object-fit:cover}
+.post-actions{display:flex;justify-content:space-around;margin-top:10px;padding-top:10px;border-top:1px solid #eee}
+.composer{background:var(--card);padding:14px;border-radius:12px;margin-top:20px}
+.composer textarea{width:100%;background:#0a0a0a;border:1px solid #2a2e36;border-radius:8px;padding:10px;color:var(--text)}
+.composer button{background:var(--accent);color:#fff;border:none;padding:10px;width:100%;border-radius:8px;font-weight:700;margin-top:8px}
+.modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);display:none;justify-content:center;align-items:center;z-index:20;padding:16px}
+.modal-content{background:var(--card);padding:20px;border-radius:16px;width:100%;max-width:420px;max-height:85vh;overflow-y:auto}
+/* 3 PONTINHOS */
+.talk-top-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.talk-menu-wrap{position:relative}
+.talk-dots-btn{background:none;border:none;font-size:22px;cursor:pointer;color:#000;padding:4px 8px;border-radius:6px}
+.talk-dropdown{position:absolute;right:0;top:28px;background:#fff;border:1px solid #ddd;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.15);min-width:180px;display:none;z-index:99}
+.talk-dropdown.show{display:block}
+.talk-dropdown button{width:100%;background:none;border:none;text-align:left;padding:12px 14px;font-size:14px;cursor:pointer}
 </style>
 </head>
 <body>
-<div id="posts"></div>
-
+<header><h1>HubSocial</h1><div><button onclick="fixUndefined()">🔧</button> <button onclick="clearPosts()">🗑️</button> <button onclick="openConfig()">⚙️</button></div></header>
+<div class="feed"><div id="posts"></div>
+<div class="composer"><textarea id="text" rows="3" placeholder="Criar post..."></textarea><input type="file" id="media" accept="image/*"><button onclick="addPost()">Postar</button></div>
+</div>
+<div class="tabs" id="tabs"></div>
+<div class="modal" id="configModal"><div class="modal-content">
+<h2>Configurações</h2>
+<input type="text" id="myName" placeholder="Seu nome"><input type="file" id="myAvatar" accept="image/*" onchange="changeMyAvatar(event)"><button onclick="saveMyAccount()">Salvar Conta</button><hr>
+<input type="text" id="accountName" placeholder="Nome conta Snap"><input type="file" id="accountImg" accept="image/*"><button onclick="addAccount()">Add Snap</button><hr>
+<input type="text" id="vibeAccountName" placeholder="Nome conta Vibe"><input type="file" id="vibeAccountImg" accept="image/*"><button onclick="addVibeAccount()">Add Vibe</button><hr>
+<input type="text" id="talkAccountName" placeholder="Nome conta Talk"><input type="text" id="talkAccountPost" placeholder="O que vai falar?"><input type="file" id="talkAccountImg" accept="image/*,video/*"><button onclick="addTalkAccount()">Add Talk c/ Post</button><hr>
+<input type="text" id="talkPostUser" placeholder="Usuário Talk"><input type="text" id="talkPostText" placeholder="Texto"><input type="file" id="talkPostMedia" accept="image/*,video/*"><button onclick="addTalkPost()">Postar TalkNow</button><br><br>
+<button onclick="closeConfig()" style="background:#555;width:100%">Fechar</button>
+</div></div>
 <script>
-let accounts = JSON.parse(localStorage.getItem('accounts')) || [{user:"lucas", img:""}, {user:"joaninha", img:""}];
-let posts = JSON.parse(localStorage.getItem('posts')) || [
-  {id:"1", tab:"talk", userId:"lucas", text:"N sei oq ka", media:"", likes:297, comments:56, shares:45},
-  {id:"2", tab:"talk", userId:"joaninha", text:"", media:"", likes:0, comments:0, shares:0}
-];
-let hiddenTalkPosts = JSON.parse(localStorage.getItem('hiddenTalkPosts')) || [];
+const tabsData=[{id:'snap',name:'SnapLife'},{id:'vibe',name:'VibeClip'},{id:'talk',name:'TalkNow'},{id:'info',name:'InfoFlash'}];
+let accounts=JSON.parse(localStorage.getItem('accounts'))||[{name:"voce",img:"",user:"voce"}];
+let posts=JSON.parse(localStorage.getItem('posts'))||[];
+let currentTab='talk';
+let hiddenTalkPosts=JSON.parse(localStorage.getItem('hiddenTalkPosts'))||[];
 
-function toggleTalkMenu(id,e){
-  e.stopPropagation();
-  document.querySelectorAll('.talk-dropdown').forEach(d=>{
-    if(d.id !== 'talk-menu-'+id) d.classList.remove('show');
-  });
-  document.getElementById('talk-menu-'+id).classList.toggle('show');
-}
-function hideTalkPost(id){
-  hiddenTalkPosts.push(id);
-  localStorage.setItem('hiddenTalkPosts', JSON.stringify(hiddenTalkPosts));
-  document.getElementById('post-'+id).remove();
-}
-document.addEventListener('click',()=>{
-  document.querySelectorAll('.talk-dropdown').forEach(d=>d.classList.remove('show'));
-});
+function toggleTalkMenu(id,e){e.stopPropagation();document.querySelectorAll('.talk-dropdown').forEach(d=>{if(d.id!=='talk-menu-'+id)d.classList.remove('show')});document.getElementById('talk-menu-'+id)?.classList.toggle('show')}
+function hideTalkPost(id){hiddenTalkPosts.push(id);localStorage.setItem('hiddenTalkPosts',JSON.stringify(hiddenTalkPosts));document.getElementById('post-'+id).style.opacity='0';setTimeout(()=>document.getElementById('post-'+id)?.remove(),300)}
+document.addEventListener('click',()=>document.querySelectorAll('.talk-dropdown').forEach(d=>d.classList.remove('show')));
 
+function renderTabs(){document.getElementById('tabs').innerHTML=tabsData.map(t=>`<div class="tab ${currentTab===t.id?'active '+t.id:''}" onclick="showFeed('${t.id}')">${t.name}</div>`).join('')}
+function showFeed(id){currentTab=id;renderTabs();renderPosts()}
 function renderPosts(){
-  const c = document.getElementById('posts');
-  c.innerHTML = "";
-  posts.filter(p=>p.tab==='talk' && !hiddenTalkPosts.includes(p.id)).reverse().forEach(p=>{
-    const acc = accounts.find(a=>a.user===p.userId) || {user:p.userId, img:"https://via.placeholder.com/40"};
-    c.innerHTML += `
-    <div class="post talk" id="post-${p.id}">
-      <div class="talk-top-row">
-        <div class="post-header">
-          <img class="avatar" src="${acc.img}">
-          <span>@${acc.user}</span>
-        </div>
-        <div class="talk-menu-wrap">
-          <button class="talk-dots-btn" onclick="toggleTalkMenu('${p.id}',event)">⋯</button>
-          <div class="talk-dropdown" id="talk-menu-${p.id}">
-            <button onclick="hideTalkPost('${p.id}')">não tenho interesse</button>
-          </div>
-        </div>
-      </div>
-      <p>${p.text}</p>
-      ${p.media ? `<img class="content" src="${p.media}">` : `<img class="content" src="https://via.placeholder.com/600x400">`}
-      <div class="post-actions">
-        <span>❤️ ${p.likes}</span>
-        <span>💬 ${p.comments}</span>
-        <span>🔄 ${p.shares}</span>
-      </div>
-    </div>`;
+  const c=document.getElementById('posts');c.innerHTML="";
+  let filtered=posts.filter(p=>p.tab===currentTab);
+  if(currentTab==='talk') filtered=filtered.filter(p=>!hiddenTalkPosts.includes(p.id));
+  filtered.slice().reverse().forEach(p=>{
+    const acc=accounts.find(a=>a.user===p.userId)||{name:p.userId,user:p.userId,img:""};
+    const mediaHtml=p.media? (p.media.startsWith('data:video')?`<video class="content" src="${p.media}" controls></video>`:`<img class="content" src="${p.media}">`) : '';
+    if(p.tab==='talk'){
+      c.innerHTML+=`<div class="post talk" id="post-${p.id}"><div class="talk-top-row"><div class="post-header"><img class="avatar" src="${acc.img||'https://via.placeholder.com/40'}"><span>@${acc.user}</span></div><div class="talk-menu-wrap"><button class="talk-dots-btn" onclick="toggleTalkMenu('${p.id}',event)">⋯</button><div class="talk-dropdown" id="talk-menu-${p.id}"><button onclick="hideTalkPost('${p.id}')">não tenho interesse</button></div></div></div><p>${p.text||''}</p>${mediaHtml}<div class="post-actions"><span>❤️ ${p.likes||0}</span><span>💬 0</span><span>🔄 0</span></div></div>`;
+    } else {
+      c.innerHTML+=`<div class="post ${p.tab}" id="post-${p.id}"><div class="post-header"><img class="avatar" src="${acc.img}"><span>${acc.name}</span></div><p>${p.text}</p>${mediaHtml}</div>`;
+    }
   });
 }
-renderPosts();
+function addPost(){
+  const text=document.getElementById('text').value;
+  const file=document.getElementById('media').files[0];
+  if(!text &&!file) return;
+  if(file){const r=new FileReader();r.onload=e=>{savePost(text,e.target.result);};r.readAsDataURL(file);} else savePost(text,"");
+}
+function savePost(text,media){
+  posts.push({id:Date.now().toString(),tab:currentTab,userId:accounts[0].user,text,media,likes:0});
+  localStorage.setItem('posts',JSON.stringify(posts));
+  document.getElementById('text').value="";document.getElementById('media').value="";renderPosts();
+}
+function addAccount(){const name=document.getElementById('accountName').value;const file=document.getElementById('accountImg').files[0];if(!name)return;if(file){const r=new FileReader();r.onload=e=>{accounts.push({name,user:name.toLowerCase().replace(/\s/g,''),img:e.target.result});localStorage.setItem('accounts',JSON.stringify(accounts))};r.readAsDataURL(file);}else{accounts.push({name,user:name.toLowerCase().replace(/\s/g,''),img:""});localStorage.setItem('accounts',JSON.stringify(accounts))}}
+function addVibeAccount(){const name=document.getElementById('vibeAccountName').value;const file=document.getElementById('vibeAccountImg').files[0];if(!name)return;if(file){const r=new FileReader();r.onload=e=>{accounts.push({name,user:name.toLowerCase().replace(/\s/g,''),img:e.target.result});localStorage.setItem('accounts',JSON.stringify(accounts))};r.readAsDataURL(file);}else{accounts.push({name,user:name.toLowerCase().replace(/\s/g,''),img:""});localStorage.setItem('accounts',JSON.stringify(accounts))}}
+function addTalkAccount(){
+  const name=document.getElementById('talkAccountName').value;
+  const text=document.getElementById('talkAccountPost').value;
+  const file=document.getElementById('talkAccountImg').files[0];
+  if(!name)return;
+  const create=(img)=>{const user=name.toLowerCase().replace(/\s/g,'');accounts.push({name,user,img});localStorage.setItem('accounts',JSON.stringify(accounts));posts.push({id:Date.now().toString(),tab:'talk',userId:user,text,media:img||"",likes:Math.floor(Math.random()*300)});localStorage.setItem('posts',JSON.stringify(posts));renderPosts()};
+  if(file){const r=new FileReader();r.onload=e=>create(e.target.result);r.readAsDataURL(file);}else create("");
+}
+function addTalkPost(){
+  const user=document.getElementById('talkPostUser').value||accounts[0].user;
+  const text=document.getElementById('talkPostText').value;
+  const file=document.getElementById('talkPostMedia').files[0];
+  const save=(m)=>{posts.push({id:Date.now().toString(),tab:'talk',userId:user,text,media:m||"",likes:0});localStorage.setItem('posts',JSON.stringify(posts));renderPosts()};
+  if(file){const r=new FileReader();r.onload=e=>save(e.target.result);r.readAsDataURL(file);}else save("");
+}
+function saveMyAccount(){const n=document.getElementById('myName').value;if(n){accounts[0].name=n;accounts[0].user=n.toLowerCase().replace(/\s/g,'');localStorage.setItem('accounts',JSON.stringify(accounts))}}
+function changeMyAvatar(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{accounts[0].img=ev.target.result;localStorage.setItem('accounts',JSON.stringify(accounts));renderPosts()};r.readAsDataURL(f)}
+function openConfig(){document.getElementById('configModal').style.display='flex'}
+function closeConfig(){document.getElementById('configModal').style.display='none'}
+function clearPosts(){if(confirm("Apagar tudo?")){localStorage.removeItem('posts');posts=[];renderPosts()}}
+function fixUndefined(){posts.forEach(p=>{if(!p.userId)p.userId=p.user||accounts[0].user});localStorage.setItem('posts',JSON.stringify(posts));renderPosts()}
+renderTabs();renderPosts();
 </script>
 </body>
 </html>
