@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HubSocial</title>
-
 <style>
 :root {
   --bg: #0a0a0a;
@@ -18,1240 +17,161 @@
   --story: #8B5CF6;
   --accent: var(--snap);
 }
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
-
-body {
-  background: var(--bg);
-  color: var(--text);
-  padding-bottom: 80px;
-  transition: background 0.3s;
-}
-
-header {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: var(--card);
-  padding: 14px 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #2a2e36;
-}
-
-header h1 {
-  font-size: 20px;
-  font-weight: 700;
-  transition: color 0.3s;
-}
-
-.header-buttons {
-  display: flex;
-  gap: 8px;
-}
-
-#btnConfig,
-#btnClear,
-#btnFix {
-  background: none;
-  border: none;
-  color: var(--muted);
-  cursor: pointer;
-  font-size: 20px;
-  padding: 4px;
-}
-
-.stories {
-  display: flex;
-  gap: 12px;
-  padding: 12px 16px;
-  overflow-x: auto;
-  background: var(--card);
-  border-bottom: 1px solid #2a2e36;
-}
-
-.stories::-webkit-scrollbar {
-  display: none;
-}
-
-.story {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  min-width: 70px;
-  cursor: pointer;
-  position: relative;
-}
-
-.story-circle {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  padding: 3px;
-  background: linear-gradient(45deg, var(--story), #EC4899);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.story img {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid var(--card);
-}
-
-.story span {
-  font-size: 10px;
-  color: var(--muted);
-  max-width: 70px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.btn-delete-account {
-  position: absolute;
-  top: -5px;
-  right: -5px;
-  background: #ff2d55;
-  color: #fff;
-  border: none;
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  font-size: 10px;
-  cursor: pointer;
-  z-index: 5;
-}
-
-.feed {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 16px;
-}
-
-.post {
-  background: var(--card);
-  border-radius: 12px;
-  padding: 12px;
-  margin-bottom: 16px;
-  position: relative;
-  border: 1px solid #1f232b;
-}
-
-.post.snap {
-  border-left: 4px solid var(--snap);
-}
-
-.post.vibe {
-  background: #000;
-  border-radius: 0;
-  height: 100vh;
-  max-height: 800px;
-  width: 100%;
-  max-width: 420px;
-  margin: 0 auto 16px;
-  padding: 0;
-  border: none;
-  overflow: hidden;
-  position: relative;
-}
-
-.post.talk {
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  background: var(--talk);
-  color: #000;
-}
-
-.post.talk.username,
-.post.talk p {
-  color: #000;
-}
-
-.post.info {
-  border-radius: 16px;
-  border: 1px solid #FFB6C1;
-  background: var(--info);
-  color: #333;
-  padding: 16px;
-}
-
-.post.info.post-header {
-  display: none;
-}
-
-.post-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
-.avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #333;
-  object-fit: cover;
-  cursor: pointer;
-  border: 2px solid #2a2e36;
-}
-
-.username {
-  font-weight: 600;
-  font-size: 15px;
-}
-
-.post img.content,
-.post video.content {
-  width: 100%;
-  border-radius: 8px;
-  margin: 10px 0;
-  max-height: 500px;
-  object-fit: cover;
-}
-
-.post p {
-  font-size: 15px;
-  line-height: 1.5;
-  white-space: pre-wrap;
-}
-
-.post.info h3 {
-  margin-bottom: 10px;
-  font-size: 18px;
-  font-weight: 700;
-}
-
-/* VIBECLIP */
-
-.vibe-container {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  background: #000;
-}
-
-.vibe-container video,
-.vibe-container > img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.vibe-side {
-  position: absolute;
-  right: 12px;
-  bottom: 120px;
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
-  align-items: center;
-  z-index: 3;
-}
-
-.vibe-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  cursor: pointer;
-  color: #fff;
-}
-
-.vibe-btn div {
-  font-size: 30px;
-  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.9));
-}
-
-.heart.liked {
-  color: #ff2d55;
-  animation: pop 0.3s;
-}
-
-@keyframes pop {
-  0% {
-    transform: scale(1);
-  }
-
-  50% {
-    transform: scale(1.6);
-  }
-
-  100% {
-    transform: scale(1);
-  }
-}
-
-/* FOTO DE PERFIL PEQUENA E REDONDA AO LADO DO NOME */
-
-.vibe-info {
-  position: absolute;
-  bottom: 80px;
-  left: 14px;
-  right: 80px;
-  color: #fff;
-  z-index: 3;
-}
-
-.vibe-user {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-.vibe-user img {
-  width: 32px;
-  height: 32px;
-  min-width: 32px;
-  border-radius: 50%;
-  border: 2px solid #fff;
-  object-fit: cover;
-}
-
-.vibe-user b {
-  font-size: 16px;
-  color: #fff;
-  text-shadow: 0 2px 6px rgba(0,0,0,0.9);
-}
-
-.vibe-info p {
-  margin: 0;
-  font-size: 14px;
-  color: #fff;
-  text-shadow: 0 2px 6px rgba(0,0,0,0.9);
-}
-
-.vibe-gradient {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 280px;
-  background: linear-gradient(
-    transparent,
-    rgba(0,0,0,0.85)
-  );
-  z-index: 2;
-}
-
-.vibe-sound {
-  position: absolute;
-  right: 12px;
-  bottom: 400px;
-  z-index: 3;
-  background: rgba(0,0,0,0.6);
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: #fff;
-  font-size: 20px;
-}
-
-.count-edit {
-  background: rgba(0,0,0,0.3);
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 6px;
-  color: inherit;
-  width: 55px;
-  text-align: center;
-  font-size: 12px;
-  font-weight: bold;
-  padding: 2px;
-}
-
-.count-edit:focus {
-  outline: 2px solid var(--vibe);
-  background: rgba(0,0,0,0.5);
-}
-
-.post-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 10px;
-  justify-content: space-around;
-  padding-top: 10px;
-  border-top: 1px solid #2a2e36;
-}
-
-.action-btn {
-  background: none;
-  border: none;
-  color: var(--muted);
-  cursor: pointer;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
-  border-radius: 8px;
-  transition: background 0.2s;
-}
-
-.action-btn:hover {
-  background: #1f232b;
-}
-
-.action-btn.liked {
-  color: #ff2d55;
-}
-
-.count-edit-normal {
-  background: #1f232b;
-  border: 1px solid #2a2e36;
-  border-radius: 6px;
-  color: inherit;
-  width: 55px;
-  text-align: center;
-  font-size: 14px;
-  padding: 3px;
-}
-
-.count-edit-normal:focus {
-  outline: 2px solid var(--accent);
-}
-
-.composer {
-  background: var(--card);
-  padding: 14px;
-  border-radius: 12px;
-  margin-top: 20px;
-  border: 1px dashed #2a2e36;
-}
-
-.post.talk.composer {
-  background: #f5f5f5;
-  border-color: #ddd;
-}
-
-.post.info.composer {
-  background: #FFE4E1;
-  border-color: #FFB6C1;
-}
-
-.composer textarea {
-  width: 100%;
-  background: #0a0a0a;
-  border: 1px solid #2a2e36;
-  border-radius: 8px;
-  padding: 10px;
-  color: var(--text);
-  resize: none;
-  font-size: 15px;
-  margin-bottom: 8px;
-}
-
-.post.talk.composer textarea {
-  background: #fff;
-  color: #000;
-  border-color: #ddd;
-}
-
-.post.info.composer textarea {
-  background: #fff;
-  color: #000;
-  border-color: #FFB6C1;
-}
-
-.composer input[type="file"] {
-  margin: 8px 0;
-  color: var(--muted);
-  font-size: 12px;
-}
-
-.composer button {
-  background: var(--accent);
-  color: white;
-  border: none;
-  padding: 10px 18px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 700;
-  width: 100%;
-  font-size: 15px;
-}
-
-.composer button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-#mediaLabel {
-  font-size: 12px;
-  color: var(--muted);
-  display: block;
-  margin-bottom: 4px;
-}
-
-.info-title-input {
-  width: 100%;
-  background: #fff;
-  border: 1px solid #FFB6C1;
-  border-radius: 8px;
-  padding: 10px;
-  color: #000;
-  margin-bottom: 8px;
-  font-weight: 700;
-  font-size: 15px;
-}
-
-.tips {
-  font-size: 11px;
-  color: var(--muted);
-  margin: 4px 0 8px;
-}
-
-.tabs {
-  display: flex;
-  justify-content: space-around;
-  background: var(--card);
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  border-top: 1px solid #2a2e36;
-  padding: 8px 0;
-  z-index: 10;
-}
-
-.tab {
-  flex: 1;
-  text-align: center;
-  cursor: pointer;
-  padding: 6px;
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 500;
-  transition: color 0.2s;
-}
-
-.tab.active.snap {
-  color: var(--snap);
-}
-
-.tab.active.vibe {
-  color: var(--vibe);
-}
-
-.tab.active.talk {
-  color: #000;
-  background: #eee;
-  border-radius: 8px;
-  margin: 0 4px;
-}
-
-.tab.active.info {
-  color: #FF69B4;
-}
-
-.tab img {
-  width: 26px;
-  height: 26px;
-  display: block;
-  margin: 0 auto 4px;
-  border-radius: 6px;
-  object-fit: cover;
-}
-
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0,0,0,0.85);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 20;
-  padding: 16px;
-}
-
-.modal-content {
-  background: var(--card);
-  padding: 20px;
-  border-radius: 16px;
-  width: 100%;
-  max-width: 420px;
-  max-height: 85vh;
-  overflow-y: auto;
-  border: 1px solid #2a2e36;
-}
-
-.modal-content h2 {
-  margin-bottom: 16px;
-}
-
-.upload-group {
-  margin-bottom: 16px;
-  border-bottom: 1px solid #2a2e36;
-  padding-bottom: 16px;
-}
-
-.upload-group h3 {
-  margin-bottom: 10px;
-  font-size: 15px;
-}
-
-.upload-group input {
-  width: 100%;
-  margin: 6px 0;
-  padding: 8px;
-  background: #0a0a0a;
-  border: 1px solid #2a2e36;
-  border-radius: 6px;
-  color: var(--text);
-}
-
-.upload-group button {
-  background: var(--accent);
-  color: #fff;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 6px;
-  cursor: pointer;
-  margin-top: 6px;
-  font-weight: 600;
-}
+* { margin:0; padding:0; box-sizing:border-box; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
+body { background:var(--bg); color:var(--text); padding-bottom:80px; transition:background 0.3s; }
+header { position:sticky; top:0; z-index:10; background:var(--card); padding:14px 16px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #2a2e36; }
+header h1 { font-size:20px; font-weight:700; transition:color 0.3s; }
+.header-buttons { display:flex; gap:8px; }
+#btnConfig,#btnClear,#btnFix { background:none; border:none; color:var(--muted); cursor:pointer; font-size:20px; padding:4px; }
+.stories { display:flex; gap:12px; padding:12px 16px; overflow-x:auto; background:var(--card); border-bottom:1px solid #2a2e36; }
+.stories::-webkit-scrollbar { display:none; }
+.story { display:flex; flex-direction:column; align-items:center; gap:4px; min-width:70px; cursor:pointer; position:relative; }
+.story-circle { width:64px; height:64px; border-radius:50%; padding:3px; background:linear-gradient(45deg,var(--story),#EC4899); display:flex; align-items:center; justify-content:center; }
+.story img { width:100%; height:100%; border-radius:50%; object-fit:cover; border:2px solid var(--card); }
+.story span { font-size:10px; color:var(--muted); max-width:70px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.btn-delete-account { position:absolute; top:-5px; right:-5px; background:#ff2d55; color:#fff; border:none; border-radius:50%; width:18px; height:18px; font-size:10px; cursor:pointer; z-index:5; }
+.feed { max-width:600px; margin:0 auto; padding:16px; }
+.post { background:var(--card); border-radius:12px; padding:12px; margin-bottom:16px; position:relative; border:1px solid #1f232b; }
+.post.snap { border-left:4px solid var(--snap); }
+.post.vibe { background:#000; border-radius:0; height:100vh; max-height:800px; width:100%; max-width:420px; margin:0 auto 16px; padding:0; border:none; overflow:hidden; position:relative; }
+.post.talk { border-radius:8px; border:1px solid #ddd; background:var(--talk); color:#000; }
+.post.talk.username,.post.talk p { color:#000; }
+.post.info { border-radius:16px; border:1px solid #FFB6C1; background:var(--info); color:#333; padding:16px; }
+.post.info.post-header { display:none; }
+.post-header { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.avatar { width:40px; height:40px; border-radius:50%; background:#333; object-fit:cover; cursor:pointer; border:2px solid #2a2e36; }
+.username { font-weight:600; font-size:15px; }
+.post img.content,.post video.content { width:100%; border-radius:8px; margin:10px 0; max-height:500px; object-fit:cover; }
+.post p { font-size:15px; line-height:1.5; white-space:pre-wrap; }
+.post.info h3 { margin-bottom:10px; font-size:18px; font-weight:700; }
+.vibe-container { position:relative; width:100%; height:100%; background:#000; }
+.vibe-container video,.vibe-container > img { width:100%; height:100%; object-fit:cover; }
+.vibe-side { position:absolute; right:12px; bottom:120px; display:flex; flex-direction:column; gap:22px; align-items:center; z-index:3; }
+.vibe-btn { display:flex; flex-direction:column; align-items:center; cursor:pointer; color:#fff; }
+.vibe-btn div { font-size:30px; filter:drop-shadow(0 2px 6px rgba(0,0,0,0.9)); }
+.heart.liked { color:#ff2d55; animation:pop 0.3s; }
+@keyframes pop { 0%{transform:scale(1);} 50%{transform:scale(1.6);} 100%{transform:scale(1);} }
+.vibe-info { position:absolute; bottom:80px; left:14px; right:80px; color:#fff; z-index:3; }
+.vibe-user { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.vibe-user img { width:32px; height:32px; min-width:32px; border-radius:50%; border:2px solid #fff; object-fit:cover; }
+.vibe-user b { font-size:16px; color:#fff; text-shadow:0 2px 6px rgba(0,0,0,0.9); }
+.vibe-info p { margin:0; font-size:14px; color:#fff; text-shadow:0 2px 6px rgba(0,0,0,0.9); }
+.vibe-gradient { position:absolute; bottom:0; left:0; right:0; height:280px; background:linear-gradient(transparent,rgba(0,0,0,0.85)); z-index:2; }
+.vibe-sound { position:absolute; right:12px; bottom:400px; z-index:3; background:rgba(0,0,0,0.6); border-radius:50%; width:40px; height:40px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#fff; font-size:20px; }
+.count-edit { background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.2); border-radius:6px; color:inherit; width:55px; text-align:center; font-size:12px; font-weight:bold; padding:2px; }
+.count-edit:focus { outline:2px solid var(--vibe); background:rgba(0,0,0,0.5); }
+.post-actions { display:flex; gap:8px; margin-top:10px; justify-content:space-around; padding-top:10px; border-top:1px solid #2a2e36; }
+.action-btn { background:none; border:none; color:var(--muted); cursor:pointer; font-size:14px; display:flex; align-items:center; gap:6px; padding:6px 10px; border-radius:8px; transition:background 0.2s; }
+.action-btn:hover { background:#1f232b; }
+.action-btn.liked { color:#ff2d55; }
+.count-edit-normal { background:#1f232b; border:1px solid #2a2e36; border-radius:6px; color:inherit; width:55px; text-align:center; font-size:14px; padding:3px; }
+.count-edit-normal:focus { outline:2px solid var(--accent); }
+.composer { background:var(--card); padding:14px; border-radius:12px; margin-top:20px; border:1px dashed #2a2e36; }
+.post.talk.composer { background:#f5f5f5; border-color:#ddd; }
+.post.info.composer { background:#FFE4E1; border-color:#FFB6C1; }
+.composer textarea { width:100%; background:#0a0a0a; border:1px solid #2a2e36; border-radius:8px; padding:10px; color:var(--text); resize:none; font-size:15px; margin-bottom:8px; }
+.post.talk.composer textarea { background:#fff; color:#000; border-color:#ddd; }
+.post.info.composer textarea { background:#fff; color:#000; border-color:#FFB6C1; }
+.composer input[type="file"] { margin:8px 0; color:var(--muted); font-size:12px; }
+.composer button { background:var(--accent); color:white; border:none; padding:10px 18px; border-radius:8px; cursor:pointer; font-weight:700; width:100%; font-size:15px; }
+.composer button:disabled { opacity:0.6; cursor:not-allowed; }
+#mediaLabel { font-size:12px; color:var(--muted); display:block; margin-bottom:4px; }
+.info-title-input { width:100%; background:#fff; border:1px solid #FFB6C1; border-radius:8px; padding:10px; color:#000; margin-bottom:8px; font-weight:700; font-size:15px; }
+.tips { font-size:11px; color:var(--muted); margin:4px 0 8px; }
+.tabs { display:flex; justify-content:space-around; background:var(--card); position:fixed; bottom:0; left:0; right:0; border-top:1px solid #2a2e36; padding:8px 0; z-index:10; }
+.tab { flex:1; text-align:center; cursor:pointer; padding:6px; color:var(--muted); font-size:11px; font-weight:500; transition:color 0.2s; }
+.tab.active.snap { color:var(--snap); }
+.tab.active.vibe { color:var(--vibe); }
+.tab.active.talk { color:#000; background:#eee; border-radius:8px; margin:0 4px; }
+.tab.active.info { color:#FF69B4; }
+.tab img { width:26px; height:26px; display:block; margin:0 auto 4px; border-radius:6px; object-fit:cover; }
+.modal { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.85); display:none; justify-content:center; align-items:center; z-index:20; padding:16px; }
+.modal-content { background:var(--card); padding:20px; border-radius:16px; width:100%; max-width:420px; max-height:85vh; overflow-y:auto; border:1px solid #2a2e36; }
+.modal-content h2 { margin-bottom:16px; }
+.upload-group { margin-bottom:16px; border-bottom:1px solid #2a2e36; padding-bottom:16px; }
+.upload-group h3 { margin-bottom:10px; font-size:15px; }
+.upload-group input { width:100%; margin:6px 0; padding:8px; background:#0a0a0a; border:1px solid #2a2e36; border-radius:6px; color:var(--text); }
+.upload-group button { background:var(--accent); color:#fff; border:none; padding:8px 14px; border-radius:6px; cursor:pointer; margin-top:6px; font-weight:600; }
+.talk-top-row{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+.talk-menu-wrap{ position:relative; }
+.talk-dots-btn{ background:none; border:none; font-size:22px; cursor:pointer; color:#000; padding:4px 8px; border-radius:6px; }
+.talk-dropdown{ position:absolute; right:0; top:28px; background:#fff; border:1px solid #ddd; border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,0.15); min-width:180px; display:none; z-index:99; }
+.talk-dropdown.show{ display:block; }
+.talk-dropdown button{ width:100%; background:none; border:none; text-align:left; padding:12px 14px; font-size:14px; cursor:pointer; }
 </style>
 </head>
-
 <body>
-
 <header>
   <h1 id="headerTitle">HubSocial</h1>
-
   <div class="header-buttons">
     <button id="btnFix" onclick="fixUndefined()" title="Corrigir @undefined">🔧</button>
     <button id="btnClear" onclick="clearPosts()" title="Limpar Posts">🗑️</button>
     <button id="btnConfig" onclick="openConfig()" title="Configurações">⚙️</button>
   </div>
 </header>
-
 <div class="stories" id="stories" style="display:none;"></div>
-
 <div class="feed">
-
   <div id="posts"></div>
-
   <div class="composer" id="composer">
-
-    <div id="infoTitleDiv" style="display:none;">
-      <input
-        type="text"
-        id="infoTitle"
-        class="info-title-input"
-        placeholder="Título da Notícia"
-      >
-    </div>
-
-    <textarea
-      id="text"
-      rows="3"
-      placeholder="Criar post..."
-    ></textarea>
-
+    <div id="infoTitleDiv" style="display:none;"><input type="text" id="infoTitle" class="info-title-input" placeholder="Título da Notícia"></div>
+    <textarea id="text" rows="3" placeholder="Criar post..."></textarea>
     <label id="mediaLabel">Adicionar Imagem:</label>
-
-    <input
-      type="file"
-      id="media"
-      accept="image/*"
-    >
-
-    <div
-      class="tips"
-      id="tips"
-      style="display:none;"
-    >
-      Dica: Grave em 480p, 5s a 10s. Máx 6MB por vídeo!
-    </div>
-
+    <input type="file" id="media" accept="image/*">
+    <div class="tips" id="tips" style="display:none;">Dica: Grave em 480p, 5s a 10s. Máx 6MB por vídeo!</div>
     <button onclick="addPost()">Postar</button>
   </div>
 </div>
-
 <div class="tabs" id="tabs"></div>
-
 <div class="modal" id="configModal">
-
   <div class="modal-content">
-
     <h2>Configurações</h2>
-
-    <div class="upload-group">
-      <h3>Editar Nossa Conta</h3>
-
-      <input
-        type="text"
-        id="myName"
-        placeholder="Seu nome de usuário"
-      >
-
-      <input
-        type="file"
-        id="myAvatar"
-        accept="image/*"
-        onchange="changeMyAvatar(event)"
-      >
-
-      <button onclick="saveMyAccount()">
-        Salvar Conta
-      </button>
-    </div>
-
-    <div class="upload-group">
-      <h3>Ícones das Abas</h3>
-      <div id="iconUploads"></div>
-    </div>
-
-    <div class="upload-group">
-      <h3>Adicionar Contas pro SnapLife</h3>
-
-      <input
-        type="text"
-        id="accountName"
-        placeholder="Nome da conta"
-      >
-
-      <input
-        type="file"
-        id="accountImg"
-        accept="image/*"
-      >
-
-      <button onclick="addAccount()">
-        Adicionar Conta
-      </button>
-    </div>
-
-    <div class="upload-group">
-      <h3>Adicionar Contas pro VibeClip</h3>
-
-      <input
-        type="text"
-        id="vibeAccountName"
-        placeholder="Nome da conta"
-      >
-
-      <input
-        type="file"
-        id="vibeAccountImg"
-        accept="image/*"
-      >
-
-      <button onclick="addVibeAccount()">
-        Adicionar Conta Vibe
-      </button>
-    </div>
-
-    <div class="upload-group">
-      <h3>Adicionar Contas + Post pro TalkNow</h3>
-
-      <input
-        type="text"
-        id="talkAccountName"
-        placeholder="Nome da conta"
-      >
-
-      <input
-        type="text"
-        id="talkAccountPost"
-        placeholder="O que ela vai falar?"
-      >
-
-      <input
-        type="file"
-        id="talkAccountImg"
-        accept="image/*,video/*"
-      >
-
-      <button onclick="addTalkAccount()">
-        Adicionar Conta com Post
-      </button>
-    </div>
-
-    <div class="upload-group">
-      <h3>Adicionar Post com Vídeo - VibeClip</h3>
-
-      <input
-        type="text"
-        id="vibePostUser"
-        placeholder="Usuário que vai postar"
-      >
-
-      <input
-        type="text"
-        id="vibePostText"
-        placeholder="Legenda do vídeo"
-      >
-
-      <input
-        type="file"
-        id="vibePostMedia"
-        accept="video/*,image/*"
-      >
-
-      <button onclick="addVibePost()">
-        Postar no VibeClip
-      </button>
-    </div>
-
-    <div class="upload-group">
-      <h3>Adicionar Post com Vídeo - TalkNow</h3>
-
-      <input
-        type="text"
-        id="talkPostUser"
-        placeholder="Usuário que vai postar"
-      >
-
-      <input
-        type="text"
-        id="talkPostText"
-        placeholder="Texto do post"
-      >
-
-      <input
-        type="file"
-        id="talkPostMedia"
-        accept="video/*,image/*"
-      >
-
-      <button onclick="addTalkPost()">
-        Postar no TalkNow
-      </button>
-    </div>
-
-    <button
-      onclick="closeConfig()"
-      style="width:100%; background:#555;"
-    >
-      Salvar e Fechar
-    </button>
-
+    <div class="upload-group"><h3>Editar Nossa Conta</h3><input type="text" id="myName" placeholder="Seu nome de usuário"><input type="file" id="myAvatar" accept="image/*" onchange="changeMyAvatar(event)"><button onclick="saveMyAccount()">Salvar Conta</button></div>
+    <div class="upload-group"><h3>Ícones das Abas</h3><div id="iconUploads"></div></div>
+    <div class="upload-group"><h3>Adicionar Contas pro SnapLife</h3><input type="text" id="accountName" placeholder="Nome da conta"><input type="file" id="accountImg" accept="image/*"><button onclick="addAccount()">Adicionar Conta</button></div>
+    <div class="upload-group"><h3>Adicionar Contas pro VibeClip</h3><input type="text" id="vibeAccountName" placeholder="Nome da conta"><input type="file" id="vibeAccountImg" accept="image/*"><button onclick="addVibeAccount()">Adicionar Conta Vibe</button></div>
+    <div class="upload-group"><h3>Adicionar Contas + Post pro TalkNow</h3><input type="text" id="talkAccountName" placeholder="Nome da conta"><input type="text" id="talkAccountPost" placeholder="O que ela vai falar?"><input type="file" id="talkAccountImg" accept="image/*,video/*"><button onclick="addTalkAccount()">Adicionar Conta com Post</button></div>
+    <div class="upload-group"><h3>Adicionar Post com Vídeo - VibeClip</h3><input type="text" id="vibePostUser" placeholder="Usuário que vai postar"><input type="text" id="vibePostText" placeholder="Legenda do vídeo"><input type="file" id="vibePostMedia" accept="video/*,image/*"><button onclick="addVibePost()">Postar no VibeClip</button></div>
+    <div class="upload-group"><h3>Adicionar Post com Vídeo - TalkNow</h3><input type="text" id="talkPostUser" placeholder="Usuário que vai postar"><input type="text" id="talkPostText" placeholder="Texto do post"><input type="file" id="talkPostMedia" accept="video/*,image/*"><button onclick="addTalkPost()">Postar no TalkNow</button></div>
+    <button onclick="closeConfig()" style="width:100%; background:#555;">Salvar e Fechar</button>
   </div>
 </div>
-
 <script>
-
 const tabsData = [
-  {
-    id: 'snap',
-    name: 'SnapLife',
-    color: '--snap',
-    media: 'image/*',
-    showStories: true
-  },
-  {
-    id: 'vibe',
-    name: 'VibeClip',
-    color: '--vibe',
-    media: 'video/*,image/*',
-    showStories: false
-  },
-  {
-    id: 'talk',
-    name: 'TalkNow',
-    color: '--talk',
-    media: 'image/*,video/*',
-    showStories: false
-  },
-  {
-    id: 'info',
-    name: 'InfoFlash',
-    color: '--info',
-    media: 'image/*',
-    showStories: false
-  }
+  { id: 'snap', name: 'SnapLife', color: '--snap', media: 'image/*', showStories: true },
+  { id: 'vibe', name: 'VibeClip', color: '--vibe', media: 'video/*,image/*', showStories: false },
+  { id: 'talk', name: 'TalkNow', color: '--talk', media: 'image/*,video/*', showStories: false },
+  { id: 'info', name: 'InfoFlash', color: '--info', media: 'image/*', showStories: false }
 ];
-
-let accounts =
-  JSON.parse(localStorage.getItem('accounts')) || [
-    {
-      name: "voce",
-      img: "",
-      user: "voce"
-    },
-    {
-      name: "mariatech",
-      img: "",
-      user: "mariatech"
-    },
-    {
-      name: "joaozinho",
-      img: "",
-      user: "joaozinho"
-    }
-  ];
-
+let accounts = JSON.parse(localStorage.getItem('accounts')) || [{ name: "voce", img: "", user: "voce" }, { name: "mariatech", img: "", user: "mariatech" }, { name: "joaozinho", img: "", user: "joaozinho" }];
 let currentTab = 'snap';
-
-let posts =
-  JSON.parse(localStorage.getItem('posts')) || [];
-
-let icons =
-  JSON.parse(localStorage.getItem('icons')) || {};
-
-
-function fixUndefined() {
-
-  let mudou = false;
-
-  posts = posts.map(p => {
-
-    if (!p.userId) {
-
-      p.userId =
-        p.user ||
-        accounts[0].user;
-
-      mudou = true;
-    }
-
-    return p;
-  });
-
-  if (mudou) {
-
-    localStorage.setItem(
-      'posts',
-      JSON.stringify(posts)
-    );
-
-    alert("Posts corrigidos! Recarregando...");
-
-    renderPosts();
-
-  } else {
-
-    alert("Nada pra corrigir!");
-  }
-}
-
-
-function clearPosts() {
-
-  if (confirm("Apagar todos os posts?")) {
-
-    localStorage.removeItem('posts');
-
-    posts = [];
-
-    renderPosts();
-  }
-}
-
-
-function deleteAccount(user) {
-
-  if (user === 'voce') {
-    return alert(
-      "Não pode apagar sua conta principal!"
-    );
-  }
-
-  if (
-    confirm(
-      `Apagar a conta @${user}? Os posts dela vão continuar`
-    )
-  ) {
-
-    accounts =
-      accounts.filter(
-        a => a.user !== user
-      );
-
-    localStorage.setItem(
-      'accounts',
-      JSON.stringify(accounts)
-    );
-
-    renderStories();
-
-    alert("Conta apagada!");
-  }
-}
-
-
-function renderTabs() {
-
-  const tabsDiv =
-    document.getElementById('tabs');
-
-  tabsDiv.innerHTML = "";
-
-  tabsData.forEach(t => {
-
-    tabsDiv.innerHTML += `
-      <div
-        class="tab ${currentTab === t.id ? 'active ' + t.id : ''}"
-        onclick="showFeed('${t.id}')"
-      >
-        <img
-          src="${
-            icons[t.id] ||
-            'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjYiIGhlaWdodD0iMjYiIGZpbGw9IiM4YThmOWEiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiLz48L3N2Zz4='
-          }"
-          alt="${t.name}"
-        >
-        ${t.name}
-      </div>
-    `;
-  });
-
-  const current =
-    tabsData.find(
-      t => t.id === currentTab
-    );
-
-  document.getElementById(
-    'headerTitle'
-  ).innerText = current.name;
-
-  document.getElementById(
-    'headerTitle'
-  ).style.color =
-    `var(${current.color})`;
-
-  document.getElementById(
-    'stories'
-  ).style.display =
-    current.showStories
-      ? 'flex'
-      : 'none';
-
-  document.getElementById(
-    'media'
-  ).accept = current.media;
-
-  document.getElementById(
-    'mediaLabel'
-  ).innerText =
-    currentTab === 'vibe'
-      ? "Gravar/Enviar Vídeo:"
-      : currentTab === 'talk'
-        ? "Adicionar Imagem/Vídeo:"
-        : "Adicionar Imagem:";
-
-  document.getElementById(
-    'tips'
-  ).style.display =
-    currentTab === 'vibe'
-      ? 'block'
-      : 'none';
-
-  document.getElementById(
-    'infoTitleDiv'
-  ).style.display =
-    currentTab === 'info'
-      ? 'block'
-      : 'none';
-
-  document.getElementById(
-    'text'
-  ).placeholder =
-    currentTab === 'info'
-      ? 'Conteúdo da notícia...'
-      : 'Criar post...';
-
-  document.documentElement.style.setProperty(
-    '--accent',
-    `var(${current.color})`
-  );
-
-  document.body.style.background =
-    current.id === 'talk'
-      ? '#fff'
-      : current.id === 'info'
-        ? '#FFF0F5'
-        : 'var(--bg)';
-}
-
-
-function toggleLike(id) {
-
-  const post =
-    posts.find(
-      p => p.id === id
-    );
-
-  if (!post) return;
-
-  post.liked =
-    !post.liked;
-
-  post.likes =
-    post.liked
-      ? post.likes + 1
-      : post.likes - 1;
-
-  localStorage.setItem(
-    'posts',
-    JSON.stringify(posts)
-  );
-
-  renderPosts();
-}
-
-
-function toggleSound(id) {
-
-  const video =
-    document.getElementById(
-      'video-' + id
-    );
-
-  if (video) {
-    video.muted =
-      !video.muted;
-  }
-}
-
-
-function editCount(id, type, el) {
-
-  const val =
-    parseInt(
-      el.value.replace(/[^0-9]/g, '')
-    ) || 0;
-
-  const post =
-    posts.find(
-      p => p.id === id
-    );
-
-  if (!post) return;
-
-  post[type] = val;
-
-  localStorage.setItem(
-    'posts',
-    JSON.stringify(posts)
-  );
-}
-
-
-function saveMyAccount() {
-
-  const name =
-    document.getElementById(
-      'myName'
-    ).value.trim();
-
-  if (name) {
-
-    accounts[0].name = name;
-
-    accounts[0].user =
-      name
-        .toLowerCase()
-        .replace(/\s/g, '');
-
-    localStorage.setItem(
-      'accounts',
-      JSON.stringify(accounts)
-    );
-
-    alert(
-      "Conta salva com sucesso!"
-    );
-
-    renderPosts();
-    renderStories();
-  }
-}
-
-
-function renderStories() {
-
-  const sDiv =
-    document.getElementById(
-      'stories'
-    );
-
-  sDiv.innerHTML = "";
-
-  accounts.forEach(a => {
-
-    sDiv.innerHTML += `
-      <div class="story">
-
-        ${
-          a.user !== 'voce'
-            ? `
-              <button
-                class="btn-delete-account"
-                onclick="deleteAccount('${a.user}')"
-              >
-                ×
-              </button>
-            `
-            : ''
-        }
-
-        <div class="story-circle">
-
-          <img
-            src="${
-              a.img ||
-              'https://via.placeholder.com/64/333/fff?text=@'
-            }"
-            alt=""
-          >
-
-        </div>
-
-        <span>
-          ${a.name}
-        </span>
-
-      </div>
-    `;
-  });
-}
-
-
+let posts = JSON.parse(localStorage.getItem('posts')) || [];
+let icons = JSON.parse(localStorage.getItem('icons')) || {};
+let hiddenTalkPosts = JSON.parse(localStorage.getItem('hiddenTalkPosts')) || [];
+function toggleTalkMenu(id,e){ e.stopPropagation(); document.querySelectorAll('.talk-dropdown').forEach(d=>{ if(d.id!=='talk-menu-'+id) d.classList.remove('show'); }); document.getElementById('talk-menu-'+id)?.classList.toggle('show'); }
+function hideTalkPost(id){ hiddenTalkPosts.push(id); localStorage.setItem('hiddenTalkPosts', JSON.stringify(hiddenTalkPosts)); const el=document.getElementById('post-'+id); if(el){ el.style.opacity='0'; setTimeout(()=>el.remove(),300); } }
+document.addEventListener('click',()=>{ document.querySelectorAll('.talk-dropdown').forEach(d=>d.classList.remove('show')); });
+function fixUndefined() { let mudou=false; posts=posts.map(p=>{ if(!p.userId){ p.userId=p.user||accounts[0].user; mudou=true; } return p; }); if(mudou){ localStorage.setItem('posts', JSON.stringify(posts)); alert("Posts corrigidos! Recarregando..."); renderPosts(); } else { alert("Nada pra corrigir!"); } }
+function clearPosts() { if(confirm("Apagar todos os posts?")){ localStorage.removeItem('posts'); posts=[]; renderPosts(); } }
+function deleteAccount(user) { if(user==='voce'){ return alert("Não pode apagar sua conta principal!"); } if(confirm(`Apagar a conta @${user}? Os posts dela vão continuar`)){ accounts=accounts.filter(a=>a.user!==user); localStorage.setItem('accounts', JSON.stringify(accounts)); renderStories(); alert("Conta apagada!"); } }
+function renderTabs() { const tabsDiv=document.getElementById('tabs'); tabsDiv.innerHTML=""; tabsData.forEach(t=>{ tabsDiv.innerHTML+=`<div class="tab ${currentTab===t.id?'active '+t.id:''}" onclick="showFeed('${t.id}')"><img src="${icons[t.id]||'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjYiIGhlaWdodD0iMjYiIGZpbGw9IiM4YThmOWEiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiLz48L3N2Zz4='}" alt="${t.name}">${t.name}</div>`; }); const current=tabsData.find(t=>t.id===currentTab); document.getElementById('headerTitle').innerText=current.name; document.getElementById('headerTitle').style.color=`var(${current.color})`; document.getElementById('stories').style.display=current.showStories?'flex':'none'; document.getElementById('media').accept=current.media; document.getElementById('mediaLabel').innerText=currentTab==='vibe'?"Gravar/Enviar Vídeo:":currentTab==='talk'?"Adicionar Imagem/Vídeo:":"Adicionar Imagem:"; document.getElementById('tips').style.display=currentTab==='vibe'?'block':'none'; document.getElementById('infoTitleDiv').style.display=currentTab==='info'?'block':'none'; document.getElementById('text').placeholder=currentTab==='info'?'Conteúdo da notícia...':'Criar post...'; document.documentElement.style.setProperty('--accent', `var(${current.color})`); document.body.style.background=current.id==='talk'?'#fff':current.id==='info'?'#FFF0F5':'var(--bg)'; }
+function toggleLike(id) { const post=posts.find(p=>p.id===id); if(!post) return; post.liked=!post.liked; post.likes=post.liked?post.likes+1:post.likes-1; localStorage.setItem('posts', JSON.stringify(posts)); renderPosts(); }
+function toggleSound(id) { const video=document.getElementById('video-'+id); if(video){ video.muted=!video.muted; } }
+function editCount(id, type, el) { const val=parseInt(el.value.replace(/[^0-9]/g,''))||0; const post=posts.find(p=>p.id===id); if(!post) return; post[type]=val; localStorage.setItem('posts', JSON.stringify(posts)); }
+function saveMyAccount() { const name=document.getElementById('myName').value.trim(); if(name){ accounts[0].name=name; accounts[0].user=name.toLowerCase().replace(/\s/g,''); localStorage.setItem('accounts', JSON.stringify(accounts)); alert("Conta salva com sucesso!"); renderPosts(); renderStories(); } }
+function renderStories() { const sDiv=document.getElementById('stories'); sDiv.innerHTML=""; accounts.forEach(a=>{ sDiv.innerHTML+=`<div class="story">${a.user!=='voce'?`<button class="btn-delete-account" onclick="deleteAccount('${a.user}')">×</button>`:''}<div class="story-circle"><img src="${a.img||'https://via.placeholder.com/64/333/fff?text=@'}" alt=""></div><span>${a.name}</span></div>`; }); }
 function changeMyAvatar(e) {
-
-  const file =
-    e.target.files[0];
-
+  const file = e.target.files[0];
   if (!file) return;
-
-  const reader =
-    new FileReader();
-
+  const reader = new FileReader();
   reader.onload = ev => {
-
-    accounts[0].img =
-      ev.target.result;
-
-    localStorage.setItem(
-      'accounts',
-      JSON.stringify(accounts)
-    );
-
+    accounts[0].img = ev.target.result;
+    localStorage.setItem('accounts', JSON.stringify(accounts));
     renderStories();
     renderPosts();
   };
-
   reader.readAsDataURL(file);
 }
+
 
 
 function addAccount() {
